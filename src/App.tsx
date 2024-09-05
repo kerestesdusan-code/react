@@ -1,24 +1,42 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { createBrowserRouter, RouterProvider, } from 'react-router-dom';
+import Layout from './components/Layout';
+import { Projects } from './components/Pages/Projects/Projects';
+import { AboutMe } from './components/Pages/AboutMe/AboutMe';
+import { ContactFrom } from './components/Pages/ContactForm/ContactForm';
 
 function App() {
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Layout empty={true} />,
+      children:
+        [
+          {
+            path: "about-me",
+            element: <AboutMe />
+          },
+          {
+            path: "contact-form",
+            element: <ContactFrom />
+          },
+
+          {
+            path: "projects",
+            element: <Projects />
+          }
+        ]
+    }
+  ])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        <React.StrictMode>
+          <RouterProvider router={router} />
+        </React.StrictMode>
+      </div>
     </div>
   );
 }
