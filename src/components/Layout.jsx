@@ -1,7 +1,7 @@
-import { Menu } from "./Menu";
 import { Outlet } from "react-router-dom";
 import { Home } from "./Pages/Home/Home";
 import { useLocation } from "react-router-dom";
+import { NavBar } from "./NavBar";
 
 export default function Layout({ empty }) {
   let location = useLocation()
@@ -9,7 +9,7 @@ export default function Layout({ empty }) {
   return (
     <div>
         <div>
-            <Menu/>
+            <NavBar/>
         </div>
         <div>
           {

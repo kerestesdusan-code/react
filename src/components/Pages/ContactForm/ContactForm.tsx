@@ -1,5 +1,5 @@
 export const ContactFrom = () => {
     return (
-        <h1>Contact Form</h1>
+        <h1>777 zavolaj a pridem</h1>
     )
 }
