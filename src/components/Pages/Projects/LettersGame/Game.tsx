@@ -137,7 +137,7 @@ export default function Game() {
           <div >
             <div >Stats:</div>
             <br></br>
-            <b className="bg-current">
+            <b className="">
               Score:</b>
             <span
             >
