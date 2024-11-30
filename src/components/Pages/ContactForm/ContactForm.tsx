@@ -1,5 +1,7 @@
 export const ContactFrom = () => {
     return (
-        <h1>777 zavolaj a pridem</h1>
-    )
-}
+        <h1>Ahoj</h1>
+    );
+};
+
+export default ContactFrom;
