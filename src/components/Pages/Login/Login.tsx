@@ -1,48 +1,107 @@
-import React, { useState } from "react";
+import React, { Children, useState } from "react";
 import axios from "axios";
 
-interface LoginResponse {
-    token: string;
+interface LoginFormData {
+    email: string;
+    password: string;
+    fullName: string;
 }
 
+interface ButtonProps {
+    onClick?: () => void;
+    disabled?: boolean;
+    children: React.ReactNode;
+}
+
+const Button = ({ onClick, disabled, children }: ButtonProps) => (
+    <button
+        onClick={onClick}
+        disabled={disabled}
+        className={`w-full btn btn-primary ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}>
+        {children}
+    </button>
+);
+
 const Login = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [formData, setFormData] = useState<LoginFormData>({
+        email: "",
+        password: "",
+        fullName: "",
+    });
+    const [loading, setLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [token, setToken] = useState<String | null>(null);
 
-    const handleLogin = async () => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }))
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setSuccessMessage("");
+        setErrorMessage("");
+
         try {
-            const response = await axios.post<LoginResponse>("http://localhost:3500/api/login", { email, password });
+            const response = await axios.post("http://localhost:3500/api/auth/login", formData);
 
-            alert("Login successful: " + response.data.token);
+            //saving token to state localStore
+            const userToken = response.data.token;
+            setToken(userToken);
+            localStorage.setItem("authToken", userToken);
+
+            setSuccessMessage("Login Successfull");
+            setFormData({ email: "", password: "", fullName: "" });
         } catch (error: any) {
-            alert(error.response?.data?.error || "Login Error");
+            setErrorMessage(error.response?.data?.error || " Login failed. Please try again");
+            console.error("Error logging in:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
-
     return (
-        <div className="login-page">
-            <h1 className="text-2xl font-bold mb-4">Login</h1>
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                className="mb-2 p-2 border rounded w-full"
-            />
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="mb-4 p-2 border rounded w-full"
-            />
-            <button
-                onClick={handleLogin}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-                Logi In
-            </button>
+        <div className="max-w-md mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+            <form className="space-y-4" onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    placeholder="Full Name"
+                    className="mt-1 block w-full input input-bordered"
+                />
+                <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email"
+                    className="mt-1 block w-full input input-bordered"
+                />
+                <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    className="mt-1 block w-full input input-bordered"
+                />
+                <Button disabled={loading}>{loading ? "Logging in..." : "Log In"}</Button>
+            </form>
+            {successMessage && <p className="text-green-600 mt-4">{successMessage}</p>}
+            {errorMessage && <p className="text-red-600 mt-4">{errorMessage}</p>}
+            {token && (
+                <p className="text-gray-600 mt-4">
+                    Token saved: <span className="font-mono text-sm">{token}</span>
+                </p>
+            )}
         </div>
     );
 };

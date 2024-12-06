@@ -30,7 +30,7 @@ const UserList = () => {
 
     const handleUpdate = async (id: string, updateData: { fullName?: string, email?: string }) => {
         try {
-            await axios.put(`http://localhost:3500/api/users/${id}`, updateData);
+            await axios.put(`http://localhost:3500/api/auth/users/${id}`, updateData);
             setUsers((prevUsers) =>
                 prevUsers.map((user) =>
                     user._id ? { ...user, ...updateData } : user

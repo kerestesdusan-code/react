@@ -3,55 +3,90 @@ import axios from "axios";
 
 interface RegisterResponse {
     message: string;
+    token?: string;
 }
 
 const Register = () => {
-    const [fullName, setFullName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [formData, setFormData] = useState({
+        fullName: "",
+        email: "",
+        password: "",
+    });
 
-    const handleRegister = async () => {
+    const [loading, setLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [token, setToken] = useState<string | null>(null);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setSuccessMessage("");
+        setErrorMessage("");
+
         try {
             const response = await axios.post<RegisterResponse>(
-                "http://localhost:3500/api/register",
-                { fullName, email, password });
-
-            alert(response.data.message || "Registration successfull!");
+                "http://localhost:3500/api/auth/register",
+                formData
+            );
+            setSuccessMessage(response.data.message || "Registration successful!");
+            setToken(response.data.token || null);
+            setFormData({ fullName: "", email: "", password: "" });
         } catch (error: any) {
-            alert(error.response?.data?.error || "Error during Registration");
+            setErrorMessage(error.response?.data?.error || "Error during registration");
+            console.error("Registration error:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="register-page">
-            <h1 className="text-2xl font-bold mb-4">Register</h1>
-            <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Full Name"
-                className="mb-2 p-2 border rounded w-full
-                "/>
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                className="mb-2 p-2 border rounded w-full"
-            />
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="mb-4 p-2 border rounded w-full"
-            />
-            <button
-                onClick={handleRegister}
-                className="px-4 py-2 bg-green-500 text-white rounded"
-            >
-                Register
-            </button>
+        <div className="max-w-md mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4 text-center">Register</h1>
+            <form className="space-y-4" onSubmit={handleRegister}>
+                <input
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    placeholder="Full Name"
+                    type="text"
+                    className="w-full input input-bordered"
+                />
+                <input
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email"
+                    type="email"
+                    className="w-full input input-bordered"
+                />
+                <input
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    type="password"
+                    className="w-full input input-bordered"
+                />
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={`w-full btn btn-primary ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                    {loading ? "Registering..." : "Register"}
+                </button>
+            </form>
+            {successMessage && <p className="text-green-600 mt-4">{successMessage}</p>}
+            {errorMessage && <p className="text-red-600 mt-4">{errorMessage}</p>}
+            {token && <p className="text-blue-600 mt-4">Your token: {token}</p>}
         </div>
     );
 };
