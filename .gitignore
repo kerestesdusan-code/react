@@ -1,25 +1,37 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# Dependencies
 /node_modules
 /server/node_modules
 /.pnp
 .pnp.js
+
+# Logs
 /logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.DS_Store
+# Environment files
+.env
+/server/.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Testing
+/coverage
+
+# Production build
+/build
+
+# IDE specific files
+.DS_Store
+
+# Lock files (optional, based on your workflow)
+/package-lock.json
+/yarn.lock
+
+# Custom assets or generated files
+/src/assets/my-foto.png

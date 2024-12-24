@@ -4,16 +4,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const Links = [
     { title: "Home", url: "/" },
     {
-        title: "Moje Projekty", url: "/projects",
+        title: "My Projects", url: "/projects",
         subItems: [
-            { title: "Kalkulačka", url: "/projects/calculator" },
+            { title: "Calculator", url: "/projects/calculator" },
             { title: "Letters Game", url: "/projects/letters-game" },
             { title: "Employee", url: "/projects/employee-list" },
             { title: "Users", url: "/projects/users-list" }
         ]
     },
-    { title: "O Mne", url: "/about-me" },
-    { title: "Kontaktný Formulár", url: "/contact-form" },
+    { title: "About Me", url: "/about-me" },
+    { title: "Contact Form", url: "/contact-form" },
     { title: "Login", url: "/login" },
     { title: "Register", url: "/register" }
 ];

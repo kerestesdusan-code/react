@@ -1,5 +1,5 @@
-import React, { Children, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import axiosInstance from "../../../utils/axiosInstance";
 
 interface LoginFormData {
     email: string;
@@ -13,14 +13,24 @@ interface ButtonProps {
     children: React.ReactNode;
 }
 
-const Button = ({ onClick, disabled, children }: ButtonProps) => (
-    <button
-        onClick={onClick}
-        disabled={disabled}
-        className={`w-full btn btn-primary ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}>
-        {children}
-    </button>
-);
+const Button = ({ onClick, disabled, children }: ButtonProps) => {
+    const validChildren = React.Children.toArray(children).map((child, index) => {
+        if (typeof child !== "string" && typeof child !== "number") {
+            console.warn(`Button chiid at index ${index} is not string or number.`)
+        }
+        return child;
+    });
+
+    return (
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            className={`w-full btn btn-primary ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+            {validChildren}
+        </button>
+    );
+};
 
 const Login = () => {
     const [formData, setFormData] = useState<LoginFormData>({
@@ -48,9 +58,9 @@ const Login = () => {
         setErrorMessage("");
 
         try {
-            const response = await axios.post("http://localhost:3500/api/auth/login", formData);
+            const response = await axiosInstance.post("auth/login", formData);
 
-            //saving token to state localStore
+            //saving token to state localStorage
             const userToken = response.data.token;
             setToken(userToken);
             localStorage.setItem("authToken", userToken);

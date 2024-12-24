@@ -5,8 +5,6 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3500;
 
-console.log("Enviroment Variables loaded:", process.env);
-
 const corsOptions = {
   origin: process.env.CORS_ORIGIN, // loading allowed origin from . env
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -24,8 +22,6 @@ const couchdbConfig = {
   username: process.env.COUCHDB_USERNAME,
   password: process.env.COUCHDB_PASSWORD,
 };
-
-console.log("CouchDB Configuration:", couchdbConfig);
 
 //API routes
 app.use("/api", require("./routes/api"));

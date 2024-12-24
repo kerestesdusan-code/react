@@ -11,11 +11,11 @@ export const Home = () => {
                 </p>
 
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Technologies Used</h2>
-                <ul className="list-disc list-inside text-gray-600 mb-8 space-y-2">
+                <ul className="text-gray-700 leading-relaxed mb-4">
                     <li><strong>Frontend:</strong> React + TypeScript, Tailwind CSS</li>
                     <li><strong>Backend and Database:</strong> CouchDB, REST API</li>
                     <li><strong>Deployment and Hosting:</strong> Paid server and custom domain</li>
-                    <li><strong>Source Code:</strong> <a href="https://github.com/kerestesdusan-code" target="_blank" className="text-blue-500 hover:text-blue-700">GitHub</a></li>
+                    <li><strong>Source Code:</strong> <a href="https://github.com/kerestesdusan-code" rel="noopener" className="text-blue-500 hover:text-blue-700">GitHub</a></li>
                 </ul>
 
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Key Features</h2>
@@ -34,6 +34,10 @@ export const Home = () => {
 
                 <p className="text-lg font-medium text-gray-800 mb-4">
                     I invite you to test the application or contact me with any questions or interest in collaboration.
+                </p>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Disclaimer</h2>
+                <p className="text-lg text-gray-600 mb-4">
+                    This application is purely for educational and presentation purposes. No personal data is collected, stored, or processed in any way.
                 </p>
             </div>
         </section>

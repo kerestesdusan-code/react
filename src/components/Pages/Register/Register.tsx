@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useRef } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
+import axiosInstance from "../../../utils/axiosInstance";
 
 interface RegisterResponse {
     message: string;
@@ -16,7 +17,8 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const [token, setToken] = useState<string | null>(null);
+    const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -26,20 +28,32 @@ const Register = () => {
         }));
     };
 
+    const handleReCAPTCHA = (token: string | null) => {
+        setRecaptchaToken(token);
+    };
+
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setSuccessMessage("");
         setErrorMessage("");
 
+        if (!recaptchaToken) {
+            setErrorMessage("Please complete the reCAPTCHA challenge.");
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await axios.post<RegisterResponse>(
-                "http://localhost:3500/api/auth/register",
-                formData
-            );
+            const response = await axiosInstance.post<RegisterResponse>('auth/register', { //RegisterResponse = type control
+                ...formData,
+                recaptchaToken,
+            });
+
             setSuccessMessage(response.data.message || "Registration successful!");
-            setToken(response.data.token || null);
             setFormData({ fullName: "", email: "", password: "" });
+            setRecaptchaToken(null);
+            recaptchaRef.current?.reset();
         } catch (error: any) {
             setErrorMessage(error.response?.data?.error || "Error during registration");
             console.error("Registration error:", error);
@@ -76,6 +90,11 @@ const Register = () => {
                     type="password"
                     className="w-full input input-bordered"
                 />
+                <ReCAPTCHA
+                    sitekey="6LdGl5IqAAAAAOBWD5nKvQVzvpcIa02V9YItl-vp"
+                    ref={recaptchaRef}
+                    onChange={handleReCAPTCHA}
+                />
                 <button
                     type="submit"
                     disabled={loading}
@@ -86,7 +105,6 @@ const Register = () => {
             </form>
             {successMessage && <p className="text-green-600 mt-4">{successMessage}</p>}
             {errorMessage && <p className="text-red-600 mt-4">{errorMessage}</p>}
-            {token && <p className="text-blue-600 mt-4">Your token: {token}</p>}
         </div>
     );
 };

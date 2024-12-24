@@ -79,37 +79,37 @@ function Calculator() {
         setDisplay("0");
         setOperation(operator);
     }
-    return (
-        <div className="text-center justify-center w-fit border-4 border-solid bg-stone-200 font-mono" >
-            <h1 className="text-lime-950 text-center">
-                Calculator
-            </h1>
-            <div className="justify-center">
-                <table className="">
-                    <tr>
-                        <th colSpan={4}>
-                            <div className=" bg-green-500 p-3 border-4 border-solid ">
-                                <h1 className="text-lg text-right text-3xl">
-                                    {display}
-                                </h1>
-                            </div>
-                        </th>
-                    </tr>
-                    {buttons.map((row, rowNumber) => {
-                        return (<tr>
-                            {
-                                buttons[rowNumber].map((button) => {
-                                    return (
-                                        <td>
-                                            <CalculatorButton value={button.toString()} handleButtonClick={handleButtonClick} />
-                                        </td>
-                                    )
-                                })
-                            }
-                        </tr>)
 
-                    })}
-                </table>
+    return (
+        <div className="relative flex justify-center items-center min-h-screen bg-white">
+            <div className="flex space-x-6 items-start">
+                <div className="absolute left-0 top1-/2 transform-translate-y-1/2 w-96 bg-amber-100 p-10 rounded-lg border border-gray-300 shadow-md">
+                    <p className="text-bg text-gray-800">
+                        This static module is a demonstration of React functionality and the integration of components in the application. Happy calculations !
+                    </p>
+                </div>
+                <div className="w-96 bg-white p-6 rounded-xl shadow-lg border-black border-4">
+                    <h1 className="text-center text-xl text-lime-950 mb-4">Calculator</h1>
+                    <div className="mb-4">
+                        <div className="bg-green-500 p-4 rounded-lg border-4 border-solid">
+                            <h1 className="text-3xl text-right">{display}</h1>
+                        </div>
+                    </div>
+                    <table className="w-full">
+                        {buttons.map((row, rowIndex) => (
+                            <tr key={rowIndex}>
+                                {row.map((button) => (
+                                    <td key={button} className="p-2">
+                                        <CalculatorButton
+                                            value={button.toString()}
+                                            handleButtonClick={handleButtonClick}
+                                        />
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </table>
+                </div>
             </div>
         </div>
     );

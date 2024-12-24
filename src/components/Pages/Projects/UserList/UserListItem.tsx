@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface User {
     _id: string,
@@ -16,6 +17,7 @@ const UserListItem = ({ user, onUpdate }: UserListItemProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [fullName, setFullName] = useState(user.fullName);
     const [email, setEmail] = useState(user.email);
+    const navigate = useNavigate();
 
     const handleSave = () => {
         onUpdate(user._id, { fullName, email });
@@ -26,15 +28,16 @@ const UserListItem = ({ user, onUpdate }: UserListItemProps) => {
         try {
             await axios.delete(`http://localhost:3500/api/auth/users/${user._id}`);
             alert("User deleted successfully");
+            navigate('/projects/users-list');
         } catch (error) {
             console.error("Error deleting user", error);
         }
     };
 
     return (
-        <li className="user-list-item">
+        <li className="bg-white rounded-lg shadow p-4 flex justify-between items-center w-full max-w-3xl mx-auto">
             {isEditing ? (
-                <div className="edit-user">
+                <div className="flex flex-col gap-4 w-full">
                     <input
                         type="text"
                         value={fullName}
@@ -49,23 +52,41 @@ const UserListItem = ({ user, onUpdate }: UserListItemProps) => {
                         placeholder="Email"
                         className="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <button onClick={handleSave}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
-                        Save
-                    </button>
+                    <div className="flex justify-end gap-4">
+                        <button
+                            onClick={handleSave}
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                            Save
+                        </button>
+                        <button
+                            onClick={() => setIsEditing(false)}
+                            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700"
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             ) : (
-                <div className="vie-user">
-                    <p className="fullName">{user.fullName}</p>
-                    <p className="email">{user.email}</p>
-                    <button onClick={() => setIsEditing(true)}
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                        Edit
-                    </button>
-                    <button onClick={handleDelete}
-                        className="bg-orange-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
-                        Delete
-                    </button>
+                <div className="flex flex-col gap-4 w-full">
+                    <div className="flex items-center gap-4">
+                        <p className="text-lg font-semibold border border-gray-300 p-2 rounded-md w-1/2">{user.fullName}</p>
+                        <p className="text-sm text-gray-500 border border-gray-300 p-2 rounded-md w-1/2">{user.email}</p>
+                    </div>
+                    <div className="flex justify-end gap-4">
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                        >
+                            Edit
+                        </button>
+                        <button
+                            onClick={handleDelete}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                        >
+                            Delete
+                        </button>
+                    </div>
                 </div>
             )}
         </li>

@@ -109,50 +109,62 @@ export default function Game() {
   }
 
   return (
-    <div style={{
-      fontFamily: "chilanka",
-    }}>
-      <h1>Falling Letters</h1>
-      <div
-      >
-        <div >
+    <div className="bg-gray-900 min-h-screen text-white flex flex-col items-center p-4">
+      <div className="absolute left-0 top1-/2 transform-translate-y-1/2 w-96 bg-amber-100 p-10 rounded-lg border border-gray-300 shadow-md">
+        <p className="text-bg text-gray-800 leading-relaxed">
+          <strong>Falling Letters</strong> is a fun and interactive game created to demonstrate the
+          <span className="text-blue-500 font-semibold"> capabilities of React </span>
+          and its component-based structure. The game combines dynamic rendering and user interaction to create an engaging experience.
+        </p>
+        <p className="mt-4 text-gray-600">
+          Your goal is to prevent the letters from piling up too high by catching or eliminating them.
+          Explore the speed controls and challenge yourself to get the highest score!
+        </p>
+      </div>
+      <h1 className="text-4xl font-bold text-blue-500 mb-6">Falling Letters</h1>
+      <div className="flex flex-col items-center">
+        <div className="relative border-4 border-gray-700 rounded-lg">
           <Display
             handleKeyPress={handleKeyPress}
             width={screenWidth}
             height={screenHeight}
           >
             {fallenLetters.length >= 30 && (
-              <div
-                style={{
-
-                }}
-              >
+              <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-75 text-red-500 text-2xl font-bold">
                 Game Over!
               </div>
             )}
             <Letters />
           </Display>
         </div>
-        <div >
-          <div >
-            <div >Stats:</div>
-            <br></br>
-            <b className="">
-              Score:</b>
-            <span
-            >
-              {score}
-            </span>
-            <b>Speed:</b>
-            {100 - speed}
-            <h3>Fallen Letters: ({fallenLetters.length})</h3>
+        <div className="mt-4 w-full text-center">
+          <div className="text-lg font-semibold text-gray-300">
+            <p>
+              <span className="text-blue-400">Score:</span>{" "}
+              <span className="text-green-400">{score}</span>
+            </p>
+            <p>
+              <span className="text-blue-400">Speed:</span>{" "}
+              <span className="text-yellow-400">{100 - speed}</span>
+            </p>
+            <p>
+              <span className="text-blue-400">Fallen Letters:</span>{" "}
+              <span className="text-red-400">({fallenLetters.length})</span>
+            </p>
+          </div>
+          <div className="flex justify-center gap-4 mt-4">
             <button
-              onClick={() => setPaused(!paused)}>
-              {" "}
-              {paused ? "Run" : "Pause"}{" "}
+              onClick={() => setPaused(!paused)}
+              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-md shadow-md transition"
+            >
+              {paused ? "Run" : "Pause"}
             </button>
             <button
-              onClick={restart}> Restart </button>
+              onClick={restart}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-md shadow-md transition"
+            >
+              Restart
+            </button>
           </div>
         </div>
       </div>
