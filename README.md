@@ -1,46 +1,85 @@
-# Getting Started with Create React App
+## How to Run the Application Locally
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is divided into two parts:
 
-## Available Scripts
+- **Frontend** (located in the `src` directory)
+- **Backend** (located in the `server` directory)
 
-In the project directory, you can run:
+To run the application locally, follow these steps:
 
-### `npm start`
+### Prerequisites
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. Install [Node.js](https://nodejs.org/) (version 16 or later).
+2. Install [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/).
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Steps to Run
 
-### `npm test`
+1. **Clone the Repository:**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```bash
+   git clone https://github.com/kerestesdusan-code/react.git
+   cd react
+   ```
 
-### `npm run build`
+2. **Set Up Backend:**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   - Navigate to the `server` directory:
+     ```bash
+     cd server
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Create a `.env` file in the `server` directory with the following default content:
+     ```env
+     PORT=5000
+     DATABASE_URL=your_database_connection_string
+     ```
+   - Start the backend server:
+     ```bash
+     npm start
+     ```
+   - The backend server should now be running on [http://localhost:5000](http://localhost:5000).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. **Set Up Frontend:**
+   - Navigate to the `src` directory:
+     ```bash
+     cd ../src
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Create a `.env` file in the `src` directory with the following default content:
+     ```env
+     REACT_APP_API_URL=http://localhost:5000
+     ```
+   - Start the frontend application:
+     ```bash
+     npm start
+     ```
+   - The frontend should now be running on [http://localhost:3000](http://localhost:3000).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Notes
 
-### `npm run eject`
+- Ensure that the backend server is running before starting the frontend application.
+- If you need to modify any environment variables, update the respective `.env` files.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Environment Variables(server and src .env)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Backend (`server/.env`)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+| Variable       | Description                              | Default Value                     |
+| -------------- | ---------------------------------------- | --------------------------------- |
+| `PORT`         | Port for the backend server              | `5000`                            |
+| `DATABASE_URL` | Connection string for the database       | `your_database_connection_string` |
+| `JWT_SECRET`   | Secret key for JSON Web Token generation | `your_jwt_secret`                 |
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Frontend (`src/.env`)
 
-## Learn More
+| Variable            | Description             | Default Value           |
+| ------------------- | ----------------------- | ----------------------- |
+| `REACT_APP_API_URL` | URL for the backend API | `http://localhost:5000` |
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+With these settings, you should be able to successfully run the project locally. For further customization or issues, feel free to raise an issue in the repository.
