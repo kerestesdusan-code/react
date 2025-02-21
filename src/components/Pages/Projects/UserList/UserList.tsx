@@ -16,7 +16,7 @@ const UserList = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await axios.get<User[]>("http://localhost:3500/api/users");
+                const response = await axios.get<User[]>(`${process.env.REACT_APP_API_URL}/api/users`);
                 setUsers(response.data);
             } catch (error) {
                 console.error("Error fetching Users", error);
@@ -30,10 +30,10 @@ const UserList = () => {
 
     const handleUpdate = async (id: string, updateData: { fullName?: string, email?: string }) => {
         try {
-            await axios.put(`http://localhost:3500/api/auth/users/${id}`, updateData);
+            await axios.put(`${process.env.REACT_APP_API_URL}/api/auth/users/${id}`, updateData);
             setUsers((prevUsers) =>
                 prevUsers.map((user) =>
-                    user._id ? { ...user, ...updateData } : user
+                    user._id === id ? { ...user, ...updateData } : user
                 )
             );
         } catch (error) {

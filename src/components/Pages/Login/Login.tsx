@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
+import ReCAPTCHA from "react-google-recaptcha";
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 interface LoginFormData {
     email: string;
@@ -14,20 +16,13 @@ interface ButtonProps {
 }
 
 const Button = ({ onClick, disabled, children }: ButtonProps) => {
-    const validChildren = React.Children.toArray(children).map((child, index) => {
-        if (typeof child !== "string" && typeof child !== "number") {
-            console.warn(`Button chiid at index ${index} is not string or number.`)
-        }
-        return child;
-    });
-
     return (
         <button
             onClick={onClick}
             disabled={disabled}
             className={`w-full btn btn-primary ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-            {validChildren}
+            {children}
         </button>
     );
 };
@@ -38,17 +33,28 @@ const Login = () => {
         password: "",
         fullName: "",
     });
+
+    console.log(BASE_URL, "ssss", process.env);
+
+
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const [token, setToken] = useState<String | null>(null);
+    const [token, setToken] = useState<string | null>(null);
+    const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
-        }))
+        }));
+    };
+
+    const handleReCAPTCHA = (token: string | null) => {
+        setRecaptchaToken(token);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -57,18 +63,31 @@ const Login = () => {
         setSuccessMessage("");
         setErrorMessage("");
 
-        try {
-            const response = await axiosInstance.post("auth/login", formData);
+        if (!recaptchaToken) {
+            setErrorMessage("Please complete the reCAPTCHA challenge.");
+            setLoading(false);
+            return;
+        }
 
-            //saving token to state localStorage
+        try {
+            const response = await axiosInstance.post(
+                `${process.env.REACT_APP_API_URL}/auth/login`,
+                {
+                    ...formData,
+                    recaptchaToken,
+                }
+            );
+
             const userToken = response.data.token;
             setToken(userToken);
             localStorage.setItem("authToken", userToken);
 
-            setSuccessMessage("Login Successfull");
+            setSuccessMessage("Login Successful!");
             setFormData({ email: "", password: "", fullName: "" });
+            setRecaptchaToken(null);
+            recaptchaRef.current?.reset();
         } catch (error: any) {
-            setErrorMessage(error.response?.data?.error || " Login failed. Please try again");
+            setErrorMessage(error.response?.data?.error || "Login failed. Please try again.");
             console.error("Error logging in:", error);
         } finally {
             setLoading(false);
@@ -103,8 +122,16 @@ const Login = () => {
                     placeholder="Password"
                     className="mt-1 block w-full input input-bordered"
                 />
+
+                <ReCAPTCHA
+                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
+                    ref={recaptchaRef}
+                    onChange={handleReCAPTCHA}
+                />
+
                 <Button disabled={loading}>{loading ? "Logging in..." : "Log In"}</Button>
             </form>
+
             {successMessage && <p className="text-green-600 mt-4">{successMessage}</p>}
             {errorMessage && <p className="text-red-600 mt-4">{errorMessage}</p>}
             {token && (

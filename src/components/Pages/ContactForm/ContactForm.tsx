@@ -2,8 +2,6 @@ import React, { useRef, useState } from "react";
 import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
 
-
-
 interface ContactFormData {
     name: string;
     email: string;
@@ -71,7 +69,6 @@ const ContactForm = () => {
     };
 
     const handleReCAPTCHA = (token: string | null) => {
-        console.log(token, "zz")
         setRecaptchaToken(token);
     };
 
@@ -80,7 +77,7 @@ const ContactForm = () => {
         setLoading(true);
         setSuccessMessage("");
         setErrorMessage("");
-        console.log(recaptchaRef, recaptchaRef?.current?.getValue(), "aaa");
+
         if (!recaptchaToken) {
             setErrorMessage("Please complete the reCAPTCHA challenge.");
             setLoading(false);
@@ -88,7 +85,7 @@ const ContactForm = () => {
         }
 
         try {
-            const response = await axios.post("http://localhost:3500/api/auth/contact", {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/contact`, {
                 ...formData,
                 recaptchaToken,
             });
@@ -127,7 +124,7 @@ const ContactForm = () => {
                     placeholder="Write your message here"
                 />
                 <ReCAPTCHA
-                    sitekey="6LdGl5IqAAAAAOBWD5nKvQVzvpcIa02V9YItl-vp"
+                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
                     ref={recaptchaRef}
                     onChange={handleReCAPTCHA}
                 />

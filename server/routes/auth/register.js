@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const nano = require("nano")("http://admin:123@127.0.0.1:5984");
+require("dotenv").config();
+const nano = require("nano")(process.env.COUCHDB_URL);
 const cors = require("cors");
 const axios = require("axios");
 require("dotenv").config();

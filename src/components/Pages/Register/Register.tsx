@@ -91,7 +91,7 @@ const Register = () => {
                     className="w-full input input-bordered"
                 />
                 <ReCAPTCHA
-                    sitekey="6LdGl5IqAAAAAOBWD5nKvQVzvpcIa02V9YItl-vp"
+                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
                     ref={recaptchaRef}
                     onChange={handleReCAPTCHA}
                 />
