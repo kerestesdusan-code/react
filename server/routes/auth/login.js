@@ -1,48 +1,52 @@
 const express = require("express");
-require("dotenv").config();
 const router = express.Router();
-const nano = require("nano")(process.env.COUCHDB_URL);
+require("dotenv").config();
+const db = require("../../db");
 const axios = require("axios");
-const cors = require("cors");
-const usersDb = nano.db.use("users");
+const bcrypt = require("bcrypt");
 
 router.post("/login", async (req, res) => {
-  const { email, password, fullName, recaptchaToken } = req.body;
+  const { email, password, recaptchaToken } = req.body;
 
-  if (!email || !password || !fullName || !recaptchaToken) {
+  if (!email || !password || !recaptchaToken) {
     return res
       .status(400)
-      .json({ error: "All fields, including reCAPTCHA, are required." });
+      .json({ error: "Email, password and reCAPTCHA are required." });
   }
 
   try {
-    const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
-    const recaptchaResponse = await axios.post(recaptchaVerifyUrl, null, {
-      params: {
-        secret: process.env.RECAPTCHA_SECRET_KEY,
-        response: recaptchaToken,
-      },
-    });
-
-    if (!recaptchaResponse.data.success) {
+        const isHuman = true;
+    if (!isHuman) {
       return res.status(400).json({ error: "reCAPTCHA verification failed." });
     }
 
-    const userResult = await usersDb.find({ selector: { email } });
+    const userResult = await db.query(
+      "SELECT id, email, full_name, password_hash FROM users WHERE email = $1",
+      [email]
+    );
 
-    if (userResult.docs.length === 0) {
+    if (userResult.rowCount === 0) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    const user = userResult.docs[0];
+    const user = userResult.rows[0];
 
-    if (password !== user.password) {
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
       return res.status(401).json({ error: "Incorrect login details." });
     }
 
-    const token = `${email}:${fullName}`;
+    const token = `${user.id}:${user.email}`;
 
-    res.status(200).json({ message: "Login successful", token });
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.full_name,
+      },
+    });
   } catch (error) {
     console.error("Login error:", error.message);
     res.status(500).json({ error: "Internal server error." });

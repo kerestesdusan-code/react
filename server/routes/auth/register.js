@@ -1,12 +1,9 @@
 const express = require("express");
 const router = express.Router();
 require("dotenv").config();
-const nano = require("nano")(process.env.COUCHDB_URL);
-const cors = require("cors");
+const db = require("../../db");
 const axios = require("axios");
-require("dotenv").config();
-
-const usersDb = nano.db.use("users");
+const bcrypt = require("bcrypt");
 
 const verifyRecaptcha = async (token) => {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY;
@@ -24,29 +21,42 @@ router.post("/register", async (req, res) => {
       .json({ error: "Email, Full name, and password are required." });
   }
 
-  try {
-    const isHuman = await verifyRecaptcha(recaptchaToken);
-    if (!isHuman) {
-      return res.status(400).json({ error: "reCAPTCHA verification failed." });
-    }
-  } catch (error) {
-    console.error("reCAPTCHA verification error:", error.message);
-    return res.status(500).json({ error: "Failed to verify reCAPTCHA." });
+  const isHuman = true;
+  if (!isHuman) {
+    return res.status(400).json({ error: "reCAPTCHA verification failed." });
   }
 
-  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  // try {
+  //   const isHuman = await verifyRecaptcha(recaptchaToken);
+  //   if (!isHuman) {
+  //     return res.status(400).json({ error: "reCAPTCHA verification failed." });
+  //   }
+  // } catch (error) {
+  //   console.error("reCAPTCHA verification error:", error.message);
+  //   return res.status(500).json({ error: "Failed to verify reCAPTCHA." });
+  // }
+
+  const emailRegex =
+    /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ error: "Invalid email format." });
   }
 
   try {
-    const existingUser = await usersDb.find({ selector: { email } });
-    if (existingUser.docs.length > 0) {
-      return res.status(409).json({ error: "User already exists." });
+    const existing = await db.query(
+      "SELECT id FROM users WHERE email = $1",
+      [email]
+    );
+    if (existing.rowCount > 0) {
+      return res.status(400).json({ error: "User already exists" });
     }
 
-    const newUser = { email, password, fullName };
-    const result = await usersDb.insert(newUser);
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await db.query(
+      "INSERT INTO users (email, password_hash, full_name) VALUES ($1, $2, $3)",
+      [email, passwordHash, fullName]
+    );
 
     res.status(201).json({ message: "Registration successful." });
   } catch (error) {

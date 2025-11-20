@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
 const axios = require("axios");
-const { error } = require("console");
 
 const verifyRecaptcha = async (token) => {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY;
@@ -21,7 +20,8 @@ router.post("/contact", async (req, res) => {
       return res.status(400).json({ error: "reCAPTCHA verification faild." });
     }
   } catch (error) {
-    return res.status(500)._construct({ error: "Fialed to verify reCAPTCHA." });
+    console.error("reCAPTCHA verification error:", error.message);
+    return res.status(500).json({ error: "Failed to verify reCAPTCHA."});
   }
 
   const transporter = nodemailer.createTransport({
@@ -37,17 +37,17 @@ router.post("/contact", async (req, res) => {
     to: process.env.ADMIN_EMAIL,
     subject: "New Concat Form Message",
     text: `You received a message form :
-        Name: &{name}
-        Email: &{email}
-        Message: &{message}`,
-  };
+        Name: ${name}
+        Email: ${email}
+        Message: ${message}`,
+   };
 
-  const userEmail = {
-    from: process.env.EMAIL_USERNAME,
-    to: email,
-    subject: "We received your message!",
-    text: `Hello &{name}, \n\nThank you for reaching out. We have received your messageand will get back to you shortly.\n\nBest regards,\n[Your Team]`,
-  };
+    const userEmail = {
+      from: process.env.EMAIL_USERNAME,
+      to: email,
+      subject: "We received your message!",
+      text: `Hello &{name}, \n\nThank you for reaching out. We have received your messageand will get back to you shortly.\n\nBest regards,\n[Your Team]`,
+    };
 
   try {
     await transporter.sendMail(adminEmail);

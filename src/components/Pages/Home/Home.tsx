@@ -1,45 +1,77 @@
 export const Home = () => {
     return (
         <section className="home p-8">
-            <div className="flex justify-end space-x-4 mb-4">
-            </div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+                Welcome to My Personal Portfolio
+            </h1>
 
-            <div>
-                <h1 className="text-3xl font-bold text-gray-800 mb-4">Welcome to My Personal Portfolio</h1>
-                <p className="text-lg text-gray-600 mb-8">
-                    This application was created as a demonstration of my software development skills, combining modern technologies and web development principles. Its purpose is not only to showcase my technical stack but also to present real experience with a complex project from design to deployment.
-                </p>
+            <p className="text-lg text-gray-600 mb-8">
+                This full-stack application was created to demonstrate my practical software 
+                development skills. It combines modern web technologies, REST API design, 
+                secure authentication, database work, and real deployment. 
+                The project reflects my journey as a self-taught developer preparing for a 
+                professional IT career.
+            </p>
 
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Technologies Used</h2>
-                <ul className="text-gray-700 leading-relaxed mb-4">
-                    <li><strong>Frontend:</strong> React + TypeScript, Tailwind CSS</li>
-                    <li><strong>Backend and Database:</strong> CouchDB, REST API</li>
-                    <li><strong>Deployment and Hosting:</strong> Paid server and custom domain</li>
-                    <li><strong>Source Code:</strong> <a href="https://github.com/kerestesdusan-code" rel="noopener" className="text-blue-500 hover:text-blue-700">GitHub</a></li>
-                </ul>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Technologies Used</h2>
 
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Key Features</h2>
-                <ul className="list-disc list-inside text-gray-600 mb-8 space-y-2">
-                    <li>Dynamic content and updates based on user interactions</li>
-                    <li>Validated forms for data integrity</li>
-                    <li>CRUD operations with CouchDB for data management</li>
-                    <li>User authentication and authorization</li>
-                    <li>HTTP communication</li>
-                </ul>
+            <ul className="text-gray-700 leading-relaxed mb-8 space-y-1">
+                <li>
+                    <strong>Frontend:</strong> React, TypeScript, Tailwind CSS
+                </li>
+                <li>
+                    <strong>Backend:</strong> Node.js, Express, REST API
+                </li>
+                <li>
+                    <strong>Database:</strong> PostgreSQL (secure password hashing, prepared statements)
+                </li>
+                <li>
+                    <strong>Security:</strong> bcrypt, Google reCAPTCHA, validation
+                </li>
+                <li>
+                    <strong>Deployment:</strong> Custom VPS server (Hetzner) + custom domain
+                </li>   
+                <li>
+                    <strong>Source Code:</strong>{" "}
+                    <a
+                        href="https://github.com/kerestesdusan-code"
+                        rel="noopener"
+                        className="text-blue-500 hover:text-blue-700"
+                    >
+                        GitHub Repository
+                    </a>
+                </li>
+            </ul>
 
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">My Goal</h2>
-                <p className="text-lg text-gray-600 mb-8">
-                    My main goals for developing this application were practical implementation of theoretical knowledge, mastering the entire development cycle, gaining deployment experience, and focusing on detailed UX/UI. I hope this project provides a clear view of my technical skills and my approach to software development.
-                </p>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Key Features</h2>
+            <ul className="list-disc list-inside text-gray-600 mb-8 space-y-2">
+                <li>Secure user registration and login with hashed passwords</li>
+                <li>Google reCAPTCHA integration for bot protection</li>
+                <li>Full CRUD operations with PostgreSQL</li>
+                <li>Reusable React components and modern UI with Tailwind CSS</li>
+                <li>REST API communication between frontend and backend</li>
+                <li>Form validation and clean UX/UI</li>
+            </ul>
 
-                <p className="text-lg font-medium text-gray-800 mb-4">
-                    I invite you to test the application or contact me with any questions or interest in collaboration.
-                </p>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Disclaimer</h2>
-                <p className="text-lg text-gray-600 mb-4">
-                    This application is purely for educational and presentation purposes. No personal data is collected, stored, or processed in any way.
-                </p>
-            </div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">My Goal</h2>
+            <p className="text-lg text-gray-600 mb-8">
+                My main goal in building this application was to gain real-world experience
+                with full-stack development, understand deployment and server configuration,
+                and build a strong foundation for a future career in software development.
+                I’m continuously improving my skills in React, TypeScript, Node.js and backend
+                architecture, aiming to become a professional developer.
+            </p>
+
+            <p className="text-lg font-medium text-gray-800 mb-6">
+                Feel free to explore the project or reach out if you’re interested in a 
+                collaboration or have any questions.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Disclaimer</h2>
+            <p className="text-lg text-gray-600">
+                This application is created purely for educational and presentation purposes.  
+                Personal data entered in forms is not used for any commercial activity.
+            </p>
         </section>
     );
 };

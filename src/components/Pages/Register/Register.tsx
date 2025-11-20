@@ -45,7 +45,7 @@ const Register = () => {
         }
 
         try {
-            const response = await axiosInstance.post<RegisterResponse>('auth/register', { //RegisterResponse = type control
+            const response = await axiosInstance.post<RegisterResponse>('auth/register', {
                 ...formData,
                 recaptchaToken,
             });
