@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
+import axiosInstance from "../../../utils/axiosInstance";
 
 interface ContactFormData {
     name: string;
@@ -56,16 +56,25 @@ const Button = ({ onClick, disabled, children }: ButtonProps & { onClick?: () =>
 );
 
 const ContactForm = () => {
-    const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        message: ""
+        });
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
     const recaptchaRef = useRef<ReCAPTCHA>(null);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({ ...prevData, [name]: value }));
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
     };
 
     const handleReCAPTCHA = (token: string | null) => {
@@ -85,7 +94,7 @@ const ContactForm = () => {
         }
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/contact`, {
+            const response = await axiosInstance.post("/auth/contact", {
                 ...formData,
                 recaptchaToken,
             });

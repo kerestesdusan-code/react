@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider, } from 'react-router-dom';
 import Layout from './components/Layout';
 import { Projects } from './components/Pages/Projects/Projects';
 import { AboutMe } from './components/Pages/AboutMe/AboutMe';
-import ContactFrom from './components/Pages/ContactForm/ContactForm';
+import ContactForm from './components/Pages/ContactForm/ContactForm';
 import Calculator from './components/Pages/Projects/Calculator/Calculator';
 import Game from './components/Pages/Projects/LettersGame/Game';
 import EmployeeList from './components/Pages/Projects/EmployeeList/EmployeeList';
@@ -37,7 +37,7 @@ function App() {
           },
           {
             path: "contact-form",
-            element: <ContactFrom />
+            element: <ContactForm />
           },
 
           {
