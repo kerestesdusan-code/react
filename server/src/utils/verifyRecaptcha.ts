@@ -28,7 +28,9 @@ export const verifyRecaptcha = async (token: string): Promise<boolean> => {
             }
         );
 
-        return response.data.success === true;
+        console.log("reCAPTCHA response:", response.data);
+        
+        return response.data.succes === true; 
     } catch (error) {
         console.error("Error verifing reCAPTCHA", error);
         return false;

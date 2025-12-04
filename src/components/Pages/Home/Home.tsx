@@ -60,7 +60,8 @@ export const Home = () => {
             </p>
           </div>
 
-          <div>
+
+3nc          <div>
             <h2 className="text-2xl font-semibold text-slate-900 mb-2">
               Disclaimer
             </h2>

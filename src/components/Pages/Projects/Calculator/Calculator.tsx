@@ -83,11 +83,6 @@ function Calculator() {
     return (
         <div className="relative flex justify-center items-center min-h-screen bg-white">
             <div className="flex space-x-6 items-start">
-                <div className="absolute left-0 top1-/2 transform-translate-y-1/2 w-96 bg-amber-100 p-10 rounded-lg border border-gray-300 shadow-md">
-                    <p className="text-bg text-gray-800">
-                        This static module is a demonstration of React functionality and the integration of components in the application. Happy calculations !
-                    </p>
-                </div>
                 <div className="w-96 bg-white p-6 rounded-xl shadow-lg border-black border-4">
                     <h1 className="text-center text-xl text-lime-950 mb-4">Calculator</h1>
                     <div className="mb-4">

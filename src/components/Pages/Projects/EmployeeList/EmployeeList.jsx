@@ -72,12 +72,6 @@ function EmployeeList() {
                 })}
             </div>
             <AddEmployee />
-            <div className="mt-8 mx-auto max-w-xl bg-amber-100 p-6 rounded-lg border border-gray-300 shadow-md">
-            <p className="text-center text-lg text-gray-700 leading-relaxed">
-                This section demonstrates the ability to dynamically manage employee data with React components.
-                Feel free to add, edit, or interact with employees in this interface.
-            </p>
-        </div>
         </div>
     );
 }

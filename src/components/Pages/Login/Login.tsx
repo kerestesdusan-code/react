@@ -34,7 +34,7 @@ const Login = () => {
         fullName: "",
     });
 
-    console.log(BASE_URL, "ssss", process.env);
+    console.log(BASE_URL, process.env);
 
 
     const [loading, setLoading] = useState(false);
@@ -70,13 +70,13 @@ const Login = () => {
         }
 
         try {
-            const response = await axiosInstance.post(
-                `${process.env.REACT_APP_API_URL}/auth/login`,
+            const response = await axiosInstance.post("/auth/login",
                 {
-                    ...formData,
-                    recaptchaToken,
+                 email: formData.email,
+                 password: formData.password,
+                 recaptchaToken,
                 }
-            );
+            );      
 
             const userToken = response.data.token;
             setToken(userToken);
