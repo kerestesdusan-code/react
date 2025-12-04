@@ -1,22 +1,25 @@
-const express = require("express");
-const router = express.Router();
-const db = require("../../db");
+import { Router, Request, Response } from "express";
+import db from "../../db/db";
+const router = Router();
 
-router.get("/", async (req, res) => {
+router.get("/", async (_req: Request, res: Response) => {
   try {
     const result = await db.query(
       'SELECT id, full_name AS "fullName", email, created_at AS "createdAt" FROM users ORDER BY id'
     );
     res.json(result.rows);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching users:", error.message);
     res.status(500).json({ error: "Error fetching users" });
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { fullName, email } = req.body;
+  const { fullName, email } = req.body as {
+    fullName?: string;
+    email?: string;
+  };
 
   if (!fullName || !email) {
     return res.status(400).json({ error: "Full name and email are required" });
@@ -25,27 +28,26 @@ router.put("/:id", async (req, res) => {
   try {
     const result = await db.query(
       `UPDATE users
-      SET full_name = $1, email = $2
-      WHERE id = $3
-      RETURNING id, full_name AS "fullName", email, created_at AS "createdAt"`,
+       SET full_name = $1, email = $2
+       WHERE id = $3
+       RETURNING id, full_name AS "fullName", email, created_at AS "createdAt"`,
       [fullName, email, id]
     );
-    
+
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
     res
       .status(200)
-      .json({message: "User updated successfully", user: result.rows[0 ]});
-
-  } catch (error) {
+      .json({ message: "User updated successfully", user: result.rows[0] });
+  } catch (error: any) {
     console.error("Error updating user:", error.message);
     res.status(500).json({ error: "Error updating user" });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -55,11 +57,11 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-      res.status(200).json({ message: "User deleted successfully" });
-  } catch (error) {
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error: any) {
     console.error("Error deleting user:", error.message);
     res.status(500).json({ error: "Error deleting user" });
   }
 });
 
-module.exports = router;
+export default router;
