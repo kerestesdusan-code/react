@@ -1,0 +1,123 @@
+nohup: ignoring input
+Server listening on port 5000
+connected to PostgreSQL
+[contact] called {
+  tokenLen: 4,
+  ip: '::ffff:127.0.0.1',
+  origin: undefined,
+  ua: 'curl/8.5.0'
+}
+[recaptcha_fail] {
+  hostname: undefined,
+  errorCodes: [ 'invalid-input-response' ],
+  action: undefined,
+  score: undefined
+}
+[recaptcha_ok]
+[smtp_env_check] {
+  host: 'smtp.m1.websupport.sk',
+  port: 587,
+  user: 'info@dkreactive.com',
+  passLen: 9,
+  from: 'info@dkreactive.com',
+  admin: 'info@dkreactive.com'
+}
+[smtp] verifying...
+[smtp] verified OK
+[smtp] sending admin mail...
+[smtp] admin mail sent
+[smtp] sending user mail...
+[smtp] user mail sent
+[contact] called {
+  tokenLen: 1721,
+  ip: '195.28.148.122',
+  origin: 'https://www.dkreactive.com',
+  ua: 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0'
+}
+[recaptcha_ok] { hostname: 'www.dkreactive.com', action: undefined, score: undefined }
+[recaptcha_ok]
+[smtp_env_check] {
+  host: 'smtp.m1.websupport.sk',
+  port: 587,
+  user: 'info@dkreactive.com',
+  passLen: 9,
+  from: 'info@dkreactive.com',
+  admin: 'info@dkreactive.com'
+}
+[smtp] verifying...
+[smtp] verified OK
+[smtp] sending admin mail...
+[smtp] admin mail sent
+[smtp] sending user mail...
+[smtp] user mail sent
+[contact] called {
+  tokenLen: 1742,
+  ip: '195.28.148.122',
+  origin: 'https://www.dkreactive.com',
+  ua: 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0'
+}
+[recaptcha_ok] { hostname: 'www.dkreactive.com', action: undefined, score: undefined }
+[recaptcha_ok]
+[smtp_env_check] {
+  host: 'smtp.m1.websupport.sk',
+  port: 587,
+  user: 'info@dkreactive.com',
+  passLen: 9,
+  from: 'info@dkreactive.com',
+  admin: 'info@dkreactive.com'
+}
+[smtp] verifying...
+[smtp] verified OK
+[smtp] sending admin mail...
+[smtp] admin mail sent
+[smtp] sending user mail...
+[smtp] user mail sent
+[contact] called {
+  tokenLen: 4,
+  ip: '::ffff:127.0.0.1',
+  origin: undefined,
+  ua: 'curl/8.5.0'
+}
+[recaptcha_fail] {
+  hostname: undefined,
+  errorCodes: [ 'invalid-input-response' ],
+  action: undefined,
+  score: undefined
+}
+[recaptcha_ok]
+[smtp_env_check] {
+  host: 'smtp.m1.websupport.sk',
+  port: 587,
+  user: 'info@dkreactive.com',
+  passLen: 9,
+  from: 'info@dkreactive.com',
+  admin: 'info@dkreactive.com'
+}
+[smtp] verifying...
+[smtp] verified OK
+[smtp] sending admin mail...
+[smtp] admin mail sent
+[smtp] sending user mail...
+[smtp] user mail sent
+[contact] called {
+  tokenLen: 1700,
+  ip: '195.28.148.122',
+  origin: 'https://www.dkreactive.com',
+  ua: 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0'
+}
+[recaptcha_ok] { hostname: 'www.dkreactive.com', action: undefined, score: undefined }
+[recaptcha_ok]
+[smtp_env_check] {
+  host: 'smtp.m1.websupport.sk',
+  port: 587,
+  user: 'info@dkreactive.com',
+  passLen: 9,
+  from: 'info@dkreactive.com',
+  admin: 'info@dkreactive.com'
+}
+[smtp] verifying...
+[smtp] verified OK
+[smtp] sending admin mail...
+[smtp] admin mail sent
+[smtp] sending user mail...
+[smtp] user mail sent

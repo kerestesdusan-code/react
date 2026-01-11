@@ -1,38 +1,84 @@
 import axios from "axios";
-import { response } from "express";
 
-export const verifyRecaptcha = async (token: string): Promise<boolean> => {
-    try {
-        const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-
-        if (!secretKey) {
-            console.error("RECAPTCHA_SECRET_KEY is missing in .env");
-            return false;
-    }
-
-        if (!token) {
-            console.error("Recaptcha token is missing");
-            return false;
-        }
-
-        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
-
-        const response = await axios.post(
-            verifyUrl,
-            null,
-            {
-                params: {
-                    secret: secretKey,
-                    response: token,
-                }
-            }
-        );
-
-        console.log("reCAPTCHA response:", response.data);
-        
-        return response.data.succes === true; 
-    } catch (error) {
-        console.error("Error verifing reCAPTCHA", error);
-        return false;
-    }
+export type RecaptchaResult = {
+  ok: boolean;
+  hostname?: string;
+  errorCodes?: string[];
+  action?: string;
+  score?: number;
 };
+
+export const verifyRecaptcha = async (
+  token?: string,
+  remoteIp?: string
+): Promise<RecaptchaResult> => {
+  // možnosť úplne vypnúť recaptcha (napr. lokálne)
+  if (process.env.RECAPTCHA_DISABLED === "true") {
+    return { ok: true };
+  }
+
+  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+
+  if (!secretKey) {
+    console.error("[recaptcha] Missing RECAPTCHA_SECRET_KEY in .env");
+    return { ok: false };
+  }
+
+  if (!token) {
+    console.error("[recaptcha] Missing token");
+    return { ok: false };
+  }
+
+  try {
+    const verifyUrl = "https://www.google.com/recaptcha/api/siteverify";
+
+    const resp = await axios.post(
+      verifyUrl,
+      null,
+      {
+        params: {
+          secret: secretKey,
+          response: token,
+          remoteip: remoteIp,
+        },
+        timeout: 5000,
+      }
+    );
+
+    const data = resp.data;
+
+    if (!data?.success) {
+      console.log("[recaptcha_fail]", {
+        hostname: data?.hostname,
+        errorCodes: data?.["error-codes"],
+        action: data?.action,
+        score: data?.score,
+      });
+
+      return {
+        ok: false,
+        hostname: data?.hostname,
+        errorCodes: data?.["error-codes"],
+        action: data?.action,
+        score: data?.score,
+      };
+    }
+
+    console.log("[recaptcha_ok]", {
+      hostname: data?.hostname,
+      action: data?.action,
+      score: data?.score,
+    });
+
+    return {
+      ok: true,
+      hostname: data?.hostname,
+      action: data?.action,
+      score: data?.score,
+    };
+  } catch (error: any) {
+    console.error("[recaptcha_error]", error?.message || error);
+    return { ok: false };
+  }
+};
+

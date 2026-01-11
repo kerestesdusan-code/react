@@ -1,5 +1,6 @@
 {
   "name": "dk-react-app",
+  "homepage": "https://dkreactive.com",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
