@@ -9,3 +9,5 @@ yarn-debug.log*
 .idea/
 .DS_Store
 database.json
+*.log
+
