@@ -1,22 +1,24 @@
-import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const Links = [
-    { title: "Home", url: "/" },
-    {
-        title: "My Projects", url: "/projects",
-        subItems: [
-            { title: "Calculator", url: "/projects/calculator" },
-            { title: "Letters Game", url: "/projects/letters-game" },
-            { title: "Employee", url: "/projects/employee-list" },
-            { title: "Users", url: "/projects/users-list" }
-        ]
-    },
-    { title: "About Me", url: "/about-me" },
-    { title: "Contact Form", url: "/contact-form" },
-    { title: "Login", url: "/login" },
-    { title: "Register", url: "/register" }
+  { title: "Home", url: "/" },
+  {
+    title: "My Projects",
+    url: "/projects",
+    subItems: [
+      { title: "Calculator", url: "/projects/calculator" },
+      { title: "Letters Game", url: "/projects/letters-game" },
+      { title: "Employee", url: "/projects/employee-list" }
+    ]
+  },
+  { title: "Users", url: "/users" },
+  { title: "Group", url: "/groups" },
+  { title: "About Me", url: "/about-me" },
+  { title: "Contact Form", url: "/contact-form" },
+  { title: "Login", url: "/login" },
+  { title: "Register", url: "/register" }
 ];
+
 
 export const Menu = () => {
     const location = useLocation();

@@ -26,6 +26,7 @@ router.post("/contact", async (req: Request, res: Response) => {
     });
   }
 
+<<<<<<< HEAD
   // --- reCAPTCHA ---
   const isHuman = await verifyRecaptcha(recaptchaToken);
   if (!isHuman) {
@@ -33,6 +34,15 @@ router.post("/contact", async (req: Request, res: Response) => {
       ok: false,
       error: "reCAPTCHA verification failed.",
     });
+=======
+  if (process.env.RECAPTCHA_ENABLED === "true") {
+    const isHuman = await verifyRecaptcha(recaptchaToken || null);
+    if (!isHuman) {
+      return res.status(400).json({
+        error: "reCAPTCHA verification failed.",
+      });
+    }
+>>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)
   }
 
   // --- SMTP ENV ---
@@ -73,6 +83,7 @@ router.post("/contact", async (req: Request, res: Response) => {
     replyTo: email,
     subject: "New Contact Form Message",
     text: `You received a message from:
+<<<<<<< HEAD
 
 Name: ${name}
 Email: ${email}
@@ -80,6 +91,11 @@ Email: ${email}
 Message:
 ${message}
 `,
+=======
+      Name: ${name}
+      Email: ${email}
+      Message: ${message}`,
+>>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)
   };
 
   const userMail = {

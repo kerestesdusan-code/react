@@ -34,6 +34,7 @@ const Input = ({ name, value, onChange, placeholder, type = "text" }: FormElemen
 );
 
 const TextArea = ({ name, value, onChange, placeholder, rows = 6 }: FormElementProps) => (
+<<<<<<< HEAD
   <textarea
     name={name}
     value={value}
@@ -42,6 +43,16 @@ const TextArea = ({ name, value, onChange, placeholder, rows = 6 }: FormElementP
     rows={rows}
     className="mt-1 block w-full input input-bordered"
   />
+=======
+    <textarea
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        rows={rows}
+        className="mt-1 block w-full textarea textarea-bordered"
+    />
+>>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)
 );
 
 const Button = ({ disabled, children }: ButtonProps) => (
@@ -81,8 +92,26 @@ const ContactForm = () => {
     setRecaptchaToken(null);
   };
 
+<<<<<<< HEAD
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+=======
+        try {
+            await axiosInstance.post("/auth/contact", {
+                ...formData,
+                recaptchaToken,
+            });
+            setSuccessMessage("Message sent successfully!");
+            setFormData({ name: "", email: "", message: "" });
+            setRecaptchaToken(null);
+        } catch (error) {
+            setErrorMessage("Failed to send the message. Please try again.");
+            console.error("Error sending message:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+>>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)
 
     if (loading) return;
 

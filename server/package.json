@@ -7,8 +7,15 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+<<<<<<< HEAD
     "prod": "npm run build && npm run start"
 
+=======
+
+    "migrate:create": "node-pg-migrate create",
+    "migrate:up": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down"
+>>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)
   },
   "author": "",
   "license": "ISC",
@@ -19,8 +26,13 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+<<<<<<< HEAD
     "express-rate-limit": "^8.2.1",
+=======
+    "jsonwebtoken": "^9.0.3",
+>>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)
     "nano": "^10.1.4",
+    "node-pg-migrate": "^8.0.4",
     "nodemailer": "^6.9.16",
     "pg": "^8.16.3",
     "uuid": "^10.0.0",

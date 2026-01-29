@@ -1,5 +1,6 @@
 import axios from "axios";
 
+<<<<<<< HEAD
 export type RecaptchaResult = {
   ok: boolean;
   hostname?: string;
@@ -7,6 +8,11 @@ export type RecaptchaResult = {
   action?: string;
   score?: number;
 };
+=======
+export const verifyRecaptcha = async (token: string | null): Promise<boolean> => {
+    try {
+        const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+>>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)
 
 export const verifyRecaptcha = async (
   token?: string,
@@ -82,3 +88,25 @@ export const verifyRecaptcha = async (
   }
 };
 
+<<<<<<< HEAD
+=======
+        const response = await axios.post(
+            verifyUrl,
+            null,
+            {
+                params: {
+                    secret: secretKey,
+                    response: token,
+                }
+            }
+        );
+
+        console.log("reCAPTCHA response:", response.data);
+        
+        return response.data.success === true; 
+    } catch (error) {
+        console.error("Error verifing reCAPTCHA", error);
+        return false;
+    }
+};
+>>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)

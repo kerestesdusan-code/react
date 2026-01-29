@@ -11,7 +11,6 @@ export const Projects = () => {
     "calculator": "Calculator",
     "letters-game": "Letters Game",
     "employee-list": "Employee List",
-    "users-list": "Users List (Full-stack)",
   };
 
   return (
@@ -157,22 +156,6 @@ export const Projects = () => {
               </p>
               <p className="text-xs font-medium text-indigo-600 uppercase tracking-wide">
                 React • Forms • Lists
-              </p>
-            </Link>
-
-            <Link
-              to="users-list"
-              className="block bg-white rounded-2xl shadow-sm border border-slate-100 p-4 hover:shadow-md hover:border-indigo-200 transition"
-            >
-              <h2 className="text-lg font-semibold text-slate-900 mb-1">
-                Users List (Full-stack)
-              </h2>
-              <p className="text-sm text-slate-600 mb-2">
-                A full-stack module connected to a PostgreSQL database. Includes user
-                listing, updating and deleting via a Node.js / Express REST API.
-              </p>
-              <p className="text-xs font-medium text-indigo-600 uppercase tracking-wide">
-                React • Node.js • Express • PostgreSQL
               </p>
             </Link>
           </div>

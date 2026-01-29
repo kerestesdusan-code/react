@@ -1,11 +1,25 @@
+import myFoto from "../../../assets/my-foto.png";
+
 export const Home = () => {
   return (
     <section className="home px-4 py-10 md:py-16 bg-slate-50">
       <div className="max-w-6xl mx-auto md:grid md:grid-cols-2 md:gap-12 items-start">
         <div className="space-y-6 max-w-xl">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
-            Welcome to My Personal Portfolio
-          </h1>
+          <div className="flex items-center gap-5">
+            <img
+              src={myFoto}
+              alt="Dušan Keresteš"
+              className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-purple-400 shadow-lg"
+            />
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
+                Welcome to My Personal Portfolio
+              </h1>
+              <p className="text-sm md:text-base text-slate-600 mt-1">
+                Dušan Keresteš
+              </p>
+            </div>
+          </div>
 
           <p className="text-lg text-slate-700">
             This full-stack application was created to demonstrate my practical software
@@ -60,8 +74,7 @@ export const Home = () => {
             </p>
           </div>
 
-
-3nc          <div>
+          <div>
             <h2 className="text-2xl font-semibold text-slate-900 mb-2">
               Disclaimer
             </h2>
