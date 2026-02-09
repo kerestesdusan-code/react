@@ -1,172 +1,166 @@
-import React, { useRef, useState } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+import React, { useState } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
 
-interface ContactFormData {
+type FormData = {
   name: string;
   email: string;
   message: string;
-}
+};
 
-interface FormElementProps {
-  name: keyof ContactFormData;
+type FormElementProps = {
+  name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  placeholder: string;
-  type?: "text" | "email";
-  rows?: number;
-}
+  placeholder?: string;
+};
 
-interface ButtonProps {
+type TextAreaProps = FormElementProps & {
+  rows?: number;
+};
+
+type ButtonProps = {
   disabled?: boolean;
   children: React.ReactNode;
-}
+};
 
-const Input = ({ name, value, onChange, placeholder, type = "text" }: FormElementProps) => (
+const Input = ({ name, value, onChange, placeholder }: FormElementProps) => (
   <input
+    type="text"
     name={name}
     value={value}
     onChange={onChange}
     placeholder={placeholder}
-    type={type}
     className="mt-1 block w-full input input-bordered"
+    required
   />
 );
 
-const TextArea = ({ name, value, onChange, placeholder, rows = 6 }: FormElementProps) => (
-<<<<<<< HEAD
+const TextArea = ({
+  name,
+  value,
+  onChange,
+  placeholder,
+  rows = 6,
+}: TextAreaProps) => (
   <textarea
     name={name}
     value={value}
     onChange={onChange}
     placeholder={placeholder}
     rows={rows}
-    className="mt-1 block w-full input input-bordered"
+    className="mt-1 block w-full textarea textarea-bordered"
+    required
   />
-=======
-    <textarea
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        rows={rows}
-        className="mt-1 block w-full textarea textarea-bordered"
-    />
->>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)
 );
 
 const Button = ({ disabled, children }: ButtonProps) => (
   <button
     type="submit"
     disabled={disabled}
-    className={`w-full btn btn-primary ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+    className="btn btn-primary w-full"
   >
     {children}
   </button>
 );
 
-const ContactForm = () => {
-  const [formData, setFormData] = useState<ContactFormData>({
+const ContactForm: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     message: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const handleReCAPTCHA = (token: string | null) => {
-    setRecaptchaToken(token);
-  };
-
-  const resetCaptcha = () => {
-    recaptchaRef.current?.reset();
-    setRecaptchaToken(null);
-  };
-
-<<<<<<< HEAD
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-=======
-        try {
-            await axiosInstance.post("/auth/contact", {
-                ...formData,
-                recaptchaToken,
-            });
-            setSuccessMessage("Message sent successfully!");
-            setFormData({ name: "", email: "", message: "" });
-            setRecaptchaToken(null);
-        } catch (error) {
-            setErrorMessage("Failed to send the message. Please try again.");
-            console.error("Error sending message:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
->>>>>>> 8622f51 (features: stable backend, groups, modified users, auth, jwt validation)
 
     if (loading) return;
 
     setLoading(true);
-    setSuccessMessage("");
-    setErrorMessage("");
-
-    if (!recaptchaToken) {
-      setErrorMessage("Please complete the reCAPTCHA challenge.");
-      setLoading(false);
-      return;
-    }
+    setError(null);
+    setSuccess(false);
 
     try {
       await axiosInstance.post("/auth/contact", {
-        ...formData,
-        recaptchaToken,
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
       });
 
-      setSuccessMessage("Message sent successfully!");
+      setSuccess(true);
       setFormData({ name: "", email: "", message: "" });
-
-      resetCaptcha();
-    } catch (error) {
-      setErrorMessage("Failed to send the message. Please try again.");
-      console.error("Error sending message:", error);
-      resetCaptcha();
+    } catch (err) {
+      setError("Failed to send message. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">Contact Us</h1>
-
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <Input name="name" value={formData.name} onChange={handleChange} placeholder="Enter your name" />
-        <Input name="email" value={formData.email} onChange={handleChange} placeholder="Enter your email" type="email" />
-        <TextArea name="message" value={formData.message} onChange={handleChange} placeholder="Write your message here" />
-
-        <ReCAPTCHA
-          sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
-          ref={recaptchaRef}
-          onChange={handleReCAPTCHA}
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-xl mx-auto space-y-4"
+    >
+      <div>
+        <label className="label">
+          <span className="label-text">Full name</span>
+        </label>
+        <Input
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Your full name"
         />
+      </div>
 
-        <Button disabled={loading}>{loading ? "Sending..." : "Send Message"}</Button>
-      </form>
+      <div>
+        <label className="label">
+          <span className="label-text">Email</span>
+        </label>
+        <Input
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="your@email.com"
+        />
+      </div>
 
-      {successMessage && <p className="text-green-600 mt-4">{successMessage}</p>}
-      {errorMessage && <p className="text-red-600 mt-4">{errorMessage}</p>}
-    </div>
+      <div>
+        <label className="label">
+          <span className="label-text">Message</span>
+        </label>
+        <TextArea
+          name="message"
+          value={formData.message}
+          onChange={handleChange}
+          placeholder="Your message..."
+        />
+      </div>
+
+      {error && <p className="text-error text-sm">{error}</p>}
+      {success && (
+        <p className="text-success text-sm">
+          Message sent successfully.
+        </p>
+      )}
+
+      <Button disabled={loading}>
+        {loading ? "Sending..." : "Send message"}
+      </Button>
+    </form>
   );
 };
 
 export default ContactForm;
-

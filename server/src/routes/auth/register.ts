@@ -23,25 +23,17 @@ router.post("/register", async (req: Request<{}, {}, RegisterBody>, res: Respons
     return res.status(400).json({ error: "Email, full name, and password are required." });
   }
 
-  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: "Invalid email format." });
-  }
-
-  if (process.env.RECAPTCHA_ENABLED === "true") {
-    const isHuman = await verifyRecaptcha(recaptchaToken || null);
-    if (!isHuman) {
-      return res.status(400).json({ error: "reCAPTCHA verification failed." });
-    }
+  if (!(await verifyRecaptcha(recaptchaToken, req.ip))) {
+    return res.status(400).json({ error: "reCAPTCHA verification failed." });
   }
 
   try {
-    const existing = await db.query<{ id: string }>(
+    const exists = await db.query(
       `SELECT id FROM "user" WHERE email = $1`,
-      [email]
+      [email.toLowerCase()]
     );
 
-    if ((existing.rowCount || 0) > 0) {
+    if (exists.rowCount) {
       return res.status(400).json({ error: "User already exists." });
     }
 
@@ -50,26 +42,25 @@ router.post("/register", async (req: Request<{}, {}, RegisterBody>, res: Respons
 
     await db.query(
       `
-      INSERT INTO "user" (
-        email,
-        password_hash,
-        full_name, 
-        is_verified, 
-        email_verification_token_hash, 
-        email_verification_expires_at
-      )
+      INSERT INTO "user"
+      (email, password_hash, full_name, is_verified,
+       email_verification_token_hash, email_verification_expires_at)
       VALUES ($1, $2, $3, false, $4, now() + interval '24 hours')
       `,
-      [email, passwordHash, fullName, hash]
+      [email.toLowerCase(), passwordHash, fullName, hash]
     );
 
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-    const verifyLink = `${frontendUrl}/verify?token=${token}&email=${encodeURIComponent(email)}`;
-    console.log("VERIFY LINK:", verifyLink);
+    const frontendUrl = process.env.FRONTEND_URL!;
+    console.log(
+      "VERIFY LINK:",
+      `${frontendUrl}/verify?token=${token}&email=${encodeURIComponent(email)}`
+    );
 
-    return res.status(201).json({ message: "Registration successful. Check your email to verify your account." });
-  } catch (error: any) {
-    console.error("Registration error:", error);
+    return res.status(201).json({
+      message: "Registration successful. Check your email to verify your account.",
+    });
+  } catch (err) {
+    console.error("Register error:", err);
     return res.status(500).json({ error: "Internal server error." });
   }
 });
