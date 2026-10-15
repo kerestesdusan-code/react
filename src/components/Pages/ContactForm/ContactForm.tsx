@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 type FormData = {
   name: string;
@@ -35,13 +36,7 @@ const Input = ({ name, value, onChange, placeholder }: FormElementProps) => (
   />
 );
 
-const TextArea = ({
-  name,
-  value,
-  onChange,
-  placeholder,
-  rows = 6,
-}: TextAreaProps) => (
+const TextArea = ({ name, value, onChange, placeholder, rows = 6 }: TextAreaProps) => (
   <textarea
     name={name}
     value={value}
@@ -54,16 +49,14 @@ const TextArea = ({
 );
 
 const Button = ({ disabled, children }: ButtonProps) => (
-  <button
-    type="submit"
-    disabled={disabled}
-    className="btn btn-primary w-full"
-  >
+  <button type="submit" disabled={disabled} className="btn btn-primary w-full">
     {children}
   </button>
 );
 
 const ContactForm: React.FC = () => {
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -74,9 +67,7 @@ const ContactForm: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -85,7 +76,6 @@ const ContactForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (loading) return;
 
     setLoading(true);
@@ -93,10 +83,18 @@ const ContactForm: React.FC = () => {
     setSuccess(false);
 
     try {
+      // reCAPTCHA v3 token
+      if (!executeRecaptcha) {
+        setError("reCAPTCHA is not ready. Please try again.");
+        return;
+      }
+      const recaptchaToken = await executeRecaptcha("contact_form");
+
       await axiosInstance.post("/auth/contact", {
         name: formData.name,
         email: formData.email,
         message: formData.message,
+        recaptchaToken,
       });
 
       setSuccess(true);
@@ -109,56 +107,32 @@ const ContactForm: React.FC = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-xl mx-auto space-y-4"
-    >
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-4">
       <div>
         <label className="label">
           <span className="label-text">Full name</span>
         </label>
-        <Input
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Your full name"
-        />
+        <Input name="name" value={formData.name} onChange={handleChange} placeholder="Your full name" />
       </div>
 
       <div>
         <label className="label">
           <span className="label-text">Email</span>
         </label>
-        <Input
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="your@email.com"
-        />
+        <Input name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" />
       </div>
 
       <div>
         <label className="label">
           <span className="label-text">Message</span>
         </label>
-        <TextArea
-          name="message"
-          value={formData.message}
-          onChange={handleChange}
-          placeholder="Your message..."
-        />
+        <TextArea name="message" value={formData.message} onChange={handleChange} placeholder="Your message..." />
       </div>
 
       {error && <p className="text-error text-sm">{error}</p>}
-      {success && (
-        <p className="text-success text-sm">
-          Message sent successfully.
-        </p>
-      )}
+      {success && <p className="text-success text-sm">Message sent successfully.</p>}
 
-      <Button disabled={loading}>
-        {loading ? "Sending..." : "Send message"}
-      </Button>
+      <Button disabled={loading}>{loading ? "Sending..." : "Send message"}</Button>
     </form>
   );
 };

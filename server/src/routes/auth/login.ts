@@ -22,7 +22,8 @@ router.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response) => 
     return res.status(400).json({ error: "Email and password are required." });
   }
 
-  if (!(await verifyRecaptcha(recaptchaToken, req.ip))) {
+  const isHuman = await verifyRecaptcha(recaptchaToken, req.ip);
+  if (!isHuman) {
     return res.status(400).json({ error: "reCAPTCHA verification failed." });
   }
 
@@ -33,13 +34,26 @@ router.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response) => 
       full_name: string | null;
       password_hash: string;
       is_verified: boolean;
+      group_id: number | null;
     }>(
       `
-      SELECT id, email, full_name, password_hash, is_verified
-      FROM "user"
-      WHERE email = $1
+      SELECT
+        u.id,
+        u.email,
+        u.full_name,
+        u.password_hash,
+        u.is_verified,
+        (
+          SELECT uhg.group_id
+          FROM user_has_group uhg
+          WHERE uhg.user_id = u.id
+          ORDER BY uhg.joined_at ASC
+          LIMIT 1
+        ) AS group_id
+      FROM "user" u
+      WHERE u.email = $1
       `,
-      [email.toLowerCase()]
+      [email.trim().toLowerCase()]
     );
 
     if (result.rowCount === 0) {
@@ -57,19 +71,25 @@ router.post("/login", async (req: Request<{}, {}, LoginBody>, res: Response) => 
       return res.status(401).json({ error: "Invalid credentials." });
     }
 
+    if (!process.env.JWT_SECRET) {
+      console.error("Missing JWT_SECRET");
+      return res.status(500).json({ error: "Internal server error." });
+    }
+
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET!,
+      process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
 
-    return res.json({
+    return res.status(200).json({
       message: "Login successful",
       token,
       user: {
         id: user.id,
         email: user.email,
         fullName: user.full_name,
+        groupId: user.group_id ?? 0,
       },
     });
   } catch (err) {

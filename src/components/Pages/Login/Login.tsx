@@ -1,8 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
-import ReCAPTCHA from "react-google-recaptcha";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthContext";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 type LoggedUser = {
   id: string;
@@ -23,29 +23,26 @@ interface LoginFormData {
 }
 
 interface ButtonProps {
-  onClick?: () => void;
   disabled?: boolean;
   children: React.ReactNode;
 }
 
-const Button = ({ onClick, disabled, children }: ButtonProps) => {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`w-full btn btn-primary ${
-        disabled ? "opacity-50 cursor-not-allowed" : ""
-      }`}
-      type="submit"
-    >
-      {children}
-    </button>
-  );
-};
+const Button = ({ disabled, children }: ButtonProps) => (
+  <button
+    disabled={disabled}
+    className={`w-full btn btn-primary ${
+      disabled ? "opacity-50 cursor-not-allowed" : ""
+    }`}
+    type="submit"
+  >
+    {children}
+  </button>
+);
 
 const Login = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuth();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
@@ -55,54 +52,44 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleReCAPTCHA = (token: string | null) => {
-    setRecaptchaToken(token);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+
     setLoading(true);
     setSuccessMessage("");
     setErrorMessage("");
 
-    if (!recaptchaToken) {
-      setErrorMessage("Please complete the reCAPTCHA challenge.");
-      setLoading(false);
-      return;
-    }
-
     try {
+      if (!executeRecaptcha) {
+        setErrorMessage("reCAPTCHA is not ready. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      const recaptchaToken = await executeRecaptcha("login");
+
       const response = await axiosInstance.post<LoginResponse>("/auth/login", {
-        email: formData.email,
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
         recaptchaToken,
       });
 
       const { token, user } = response.data;
 
-    setAuth(token, user);
+      setAuth(token, user);
 
-      if (user.groupId === 1) {
-        navigate("/users");
-      } else {
-        navigate("/");
-      }
+      if (user.groupId === 1) navigate("/users");
+      else navigate("/");
 
       setSuccessMessage("Login successful!");
       setFormData({ email: "", password: "" });
-
-      setRecaptchaToken(null);
-      recaptchaRef.current?.reset();
-
     } catch (error: any) {
       setErrorMessage(
         error.response?.data?.error || "Login failed. Please try again."
@@ -138,18 +125,14 @@ const Login = () => {
           autoComplete="current-password"
         />
 
-        <ReCAPTCHA
-          sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY || ""}
-          ref={recaptchaRef}
-          onChange={handleReCAPTCHA}
-        />
-
         <Button disabled={loading}>
           {loading ? "Logging in..." : "Log In"}
         </Button>
       </form>
 
-      {successMessage && <p className="text-green-600 mt-4">{successMessage}</p>}
+      {successMessage && (
+        <p className="text-green-600 mt-4">{successMessage}</p>
+      )}
       {errorMessage && <p className="text-red-600 mt-4">{errorMessage}</p>}
     </div>
   );

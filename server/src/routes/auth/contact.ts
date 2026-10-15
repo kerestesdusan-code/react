@@ -13,10 +13,7 @@ router.post("/contact", async (req: Request, res: Response) => {
   };
 
   const isDev = process.env.NODE_ENV !== "production";
-
-  if (isDev) {
-    console.log("[contact] called", { ip: req.ip });
-  }
+  if (isDev) console.log("[contact] called", { ip: req.ip });
 
   // --- basic payload check ---
   if (!name || !email || !message) {
@@ -26,14 +23,13 @@ router.post("/contact", async (req: Request, res: Response) => {
     });
   }
 
-
-  if (process.env.RECAPTCHA_ENABLED === "true") {
-    const isHuman = await verifyRecaptcha(recaptchaToken, req.ip);
-    if (!isHuman) {
-      return res.status(400).json({
-        error: "reCAPTCHA verification failed.",
-      });
-    }
+  // --- reCAPTCHA (verifyRecaptcha itself respects RECAPTCHA_ENABLED) ---
+  const isHuman = await verifyRecaptcha(recaptchaToken, req.ip);
+  if (!isHuman) {
+    return res.status(400).json({
+      ok: false,
+      error: "reCAPTCHA verification failed.",
+    });
   }
 
   // --- SMTP ENV ---
@@ -56,11 +52,8 @@ router.post("/contact", async (req: Request, res: Response) => {
   const transporter = nodemailer.createTransport({
     host: smtpHost,
     port: smtpPort,
-    secure: false,          // STARTTLS on 587
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
+    secure: false, // STARTTLS on 587
+    auth: { user: smtpUser, pass: smtpPass },
     requireTLS: true,
     tls: { minVersion: "TLSv1.2" },
     connectionTimeout: 10_000,
@@ -75,9 +68,9 @@ router.post("/contact", async (req: Request, res: Response) => {
     subject: "New Contact Form Message",
     text: `You received a message from:
 
-      Name: ${name}
-      Email: ${email}
-      Message: ${message}`,
+Name: ${name}
+Email: ${email}
+Message: ${message}`,
   };
 
   const userMail = {
@@ -102,7 +95,6 @@ DKReactive`,
       message: "Message sent successfully.",
     });
   } catch (err: any) {
-    // log minimal info (no secrets)
     console.error("[contact_error] send failed", {
       message: err?.message,
       code: err?.code,
@@ -117,4 +109,3 @@ DKReactive`,
 });
 
 export default router;
-

@@ -4,9 +4,8 @@ export async function verifyRecaptcha(
   token?: string,
   remoteIp?: string
 ): Promise<boolean> {
-  if (process.env.RECAPTCHA_ENABLED !== "true") {
-    return true;
-  }
+  const enabled = process.env.RECAPTCHA_ENABLED === "true";
+  if (!enabled) return true;
 
   const secretKey = process.env.RECAPTCHA_SECRET_KEY;
 

@@ -1,6 +1,7 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
+
 interface DisplayProps {
-  handleKeyPress: Function;
+  handleKeyPress: (event: React.KeyboardEvent<HTMLDivElement>) => void;
   width: number;
   height: number;
   children: ReactNode;
@@ -12,18 +13,17 @@ export default function Display({
   width,
   height,
 }: DisplayProps) {
-  const [state] = useState(true);
   return (
     <div
       tabIndex={0}
-      onKeyDown={(event) => handleKeyPress(event)}
-      onKeyUp={(event) => handleKeyPress(event)}
+      onKeyDown={handleKeyPress}
+      onKeyUp={handleKeyPress}
       style={{
         position: "relative",
         border: "1px solid silver",
         overflow: "hidden",
-        width: width + "px",
-        height: height + "px",
+        width: `${width}px`,
+        height: `${height}px`,
         margin: 0,
       }}
     >

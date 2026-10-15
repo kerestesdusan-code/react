@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import AppLayout from "./components/AppLayout";
@@ -56,13 +57,19 @@ function App() {
     },
   ]);
 
-  return (
-    <div className="App">
-      <React.StrictMode>
+return (
+  <div className="App">
+    <React.StrictMode>
+      <GoogleReCaptchaProvider
+        reCaptchaKey={process.env.REACT_APP_RECAPTCHA_SITE_KEY as string}
+        scriptProps={{ async: true, defer: true, appendTo: "head" }}
+      >
         <RouterProvider router={router} />
-      </React.StrictMode>
-    </div>
-  );
+      </GoogleReCaptchaProvider>
+    </React.StrictMode>
+  </div>
+);
+
 }
 
 export default App;
