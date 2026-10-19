@@ -57,19 +57,25 @@ function App() {
     },
   ]);
 
-return (
-  <div className="App">
-    <React.StrictMode>
-      <GoogleReCaptchaProvider
-        reCaptchaKey={process.env.REACT_APP_RECAPTCHA_SITE_KEY as string}
-        scriptProps={{ async: true, defer: true, appendTo: "head" }}
-      >
-        <RouterProvider router={router} />
-      </GoogleReCaptchaProvider>
-    </React.StrictMode>
-  </div>
-);
+  const recaptchaEnabled =
+    process.env.REACT_APP_RECAPTCHA_ENABLED === "true";
 
+  const routerProvider = <RouterProvider router={router} />;
+
+  return (
+    <div className="App">
+      {recaptchaEnabled ? (
+        <GoogleReCaptchaProvider
+          reCaptchaKey={process.env.REACT_APP_RECAPTCHA_SITE_KEY as string}
+          scriptProps={{ async: true, defer: true, appendTo: "head" }}
+        >
+          {routerProvider}
+        </GoogleReCaptchaProvider>
+      ) : (
+        routerProvider
+      )}
+    </div>
+  );
 }
 
 export default App;
