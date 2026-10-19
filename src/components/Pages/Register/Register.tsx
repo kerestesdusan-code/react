@@ -9,6 +9,8 @@ interface RegisterResponse {
 
 const Register = () => {
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const recaptchaEnabled =
+  process.env.REACT_APP_RECAPTCHA_ENABLED === "true";
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -27,17 +29,22 @@ const Register = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setSuccessMessage("");
     setErrorMessage("");
 
     try {
-      if (!executeRecaptcha) {
-        setErrorMessage("reCAPTCHA is not ready. Please try again.");
-        return;
-      }
+      let recaptchaToken: string | undefined;
 
-      const recaptchaToken = await executeRecaptcha("register");
+      if (recaptchaEnabled) {
+        if (!executeRecaptcha) {
+          setErrorMessage("reCAPTCHA is not ready. Please try again.");
+          return;
+        }
+
+        recaptchaToken = await executeRecaptcha("register");
+      }
 
       const response = await axiosInstance.post<RegisterResponse>("/auth/register", {
         ...formData,
