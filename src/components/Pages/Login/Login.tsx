@@ -43,6 +43,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuth();
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const recaptchaEnabled = process.env.REACT_APP_RECAPTCHA_ENABLED === "true";
 
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
@@ -67,13 +68,16 @@ const Login = () => {
     setErrorMessage("");
 
     try {
-      if (!executeRecaptcha) {
-        setErrorMessage("reCAPTCHA is not ready. Please try again.");
-        setLoading(false);
-        return;
-      }
+      let recaptchaToken: string | undefined;
 
-      const recaptchaToken = await executeRecaptcha("login");
+       if (recaptchaEnabled) {
+        if (!executeRecaptcha) {
+          setErrorMessage("reCAPTCHA is not ready. Please try again later.");
+          return;
+        }
+
+        recaptchaToken = await executeRecaptcha("login");
+      }
 
       const response = await axiosInstance.post<LoginResponse>("/auth/login", {
         email: formData.email.trim().toLowerCase(),
