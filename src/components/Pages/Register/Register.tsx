@@ -10,7 +10,7 @@ interface RegisterResponse {
 const Register = () => {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const recaptchaEnabled =
-  process.env.REACT_APP_RECAPTCHA_ENABLED === "true";
+    process.env.REACT_APP_RECAPTCHA_ENABLED === "true";
 
   const [formData, setFormData] = useState({
     fullName: "",
