@@ -56,6 +56,8 @@ const Button = ({ disabled, children }: ButtonProps) => (
 
 const ContactForm: React.FC = () => {
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const recaptchaEnabled =
+    process.env.REACT_APP_RECAPTCHA_ENABLED === "true";
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -83,13 +85,16 @@ const ContactForm: React.FC = () => {
     setSuccess(false);
 
     try {
-      // reCAPTCHA v3 token
-      if (!executeRecaptcha) {
-        setError("reCAPTCHA is not ready. Please try again.");
-        return;
-      }
-      const recaptchaToken = await executeRecaptcha("contact_form");
+      let recaptchaToken: string | undefined;
 
+      if (recaptchaEnabled) {
+        if (!executeRecaptcha) {
+          setError("reCAPTCHA is not ready. Please try again.");
+          return;
+        }
+        
+        recaptchaToken = await executeRecaptcha("contact_form");
+      }
       await axiosInstance.post("/auth/contact", {
         name: formData.name,
         email: formData.email,
