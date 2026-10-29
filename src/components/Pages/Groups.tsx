@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -56,7 +56,7 @@ export default function Groups() {
     return selectedGroup.ownerId === user.id;
   }, [selectedGroup, user]);
 
-  async function loadGroups() {
+  const loadGroups = useCallback(async () => {
     setLoading(true);
     setError("");
     setMessage("");
@@ -67,16 +67,20 @@ export default function Groups() {
 
       setGroups(list);
 
-      if (!selectedGroupId && list.length > 0) {
-        setSelectedGroupId(list[0].id);
-      }
+      setSelectedGroupId((currentId) => {
+        if (currentId && list.some((group) => group.id === currentId)) {
+          return currentId;
+        }
+
+        return list[0]?.id ?? null;
+      });
       
     } catch (e: any) {
       setError(e?.response?.data?.error || "Failed to load groups.");
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   async function loadMembers(groupId: string) {
     setLoadingMembers(true);
@@ -93,12 +97,16 @@ export default function Groups() {
   }
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      setGroups([])
-      setSelectedGroupId(null);
-      setMembers([]);
+    if (isLoggedIn) {
+      loadGroups();
+      return;
     }
-  }, [isLoggedIn]);
+
+    setGroups([]);
+    setSelectedGroupId(null);
+    setMembers([]);
+    setLoading(false);
+  }, [isLoggedIn, loadGroups]);
 
   useEffect(() => {
     if (!selectedGroupId) return;
