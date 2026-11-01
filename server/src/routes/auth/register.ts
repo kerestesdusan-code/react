@@ -23,6 +23,8 @@ router.post("/register", async (req: Request<{}, {}, RegisterBody>, res: Respons
     return res.status(400).json({ error: "Email, full name, and password are required." });
   }
 
+  const normalizedEmail = email.trim().toLowerCase();
+
   if (!(await verifyRecaptcha(recaptchaToken, req.ip))) {
     return res.status(400).json({ error: "reCAPTCHA verification failed." });
   }
@@ -30,7 +32,7 @@ router.post("/register", async (req: Request<{}, {}, RegisterBody>, res: Respons
   try {
     const exists = await db.query(
       `SELECT id FROM "user" WHERE email = $1`,
-      [email.toLowerCase()]
+      [normalizedEmail]
     );
 
     if (exists.rowCount) {
@@ -47,13 +49,13 @@ router.post("/register", async (req: Request<{}, {}, RegisterBody>, res: Respons
        email_verification_token_hash, email_verification_expires_at)
       VALUES ($1, $2, $3, false, $4, now() + interval '24 hours')
       `,
-      [email.toLowerCase(), passwordHash, fullName, hash]
+      [normalizedEmail, passwordHash, fullName, hash]
     );
 
     const frontendUrl = process.env.FRONTEND_URL!;
     console.log(
       "VERIFY LINK:",
-      `${frontendUrl}/verify?token=${token}&email=${encodeURIComponent(email)}`
+      `${frontendUrl}/verify?token=${token}&email=${encodeURIComponent(normalizedEmail)}`
     );
 
     return res.status(201).json({
