@@ -15,6 +15,7 @@ import Login from "./components/Pages/Login/Login";
 import Register from "./components/Pages/Register/Register";
 import Users from "./components/Pages/Users";
 import Groups from "./components/Pages/Groups";
+import Verify from "./components/Pages/Verify/Verify";
 
 function ErrorPage() {
   return (
@@ -53,6 +54,7 @@ function App() {
 
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
+        { path: "verify", element: <Verify /> },
       ],
     },
   ]);
