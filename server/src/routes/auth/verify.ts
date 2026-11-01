@@ -34,7 +34,7 @@ router.get("/verify", async (req: Request, res: Response) => {
     }
 
     return res.json({ message: "Email verified." });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Verify error", error);
     return res.status(500).json({ error: "Internal server error." });
   }
