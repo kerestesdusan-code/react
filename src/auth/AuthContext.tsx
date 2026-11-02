@@ -53,8 +53,19 @@ export const AuthProvider: React.FC<{children : React.ReactNode}> = ({ children 
             setToken(localStorage.getItem(TOKEN_KEY));
             setUser(readUserFromStorage());
         };
+
+        const onAuthLogout = () => {
+            setToken(null);
+            setUser(null);
+        };
+
         window.addEventListener("storage", onStorage);
-        return () => window.removeEventListener("storage", onStorage);
+        window.addEventListener("auth:logout", onAuthLogout);
+
+        return () => {
+            window.removeEventListener("storage", onStorage);
+            window.removeEventListener("auth:logout", onAuthLogout);
+        }
     }, []);
 
     const value = useMemo<AuthState>(() => {

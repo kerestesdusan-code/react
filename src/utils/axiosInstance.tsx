@@ -26,6 +26,24 @@ axiosInstance.interceptors.response.use(
         data: err?.response?.data,
       });
     }
+
+    const status = err?.response?.status;
+    const errorMessage = err?.response?.data?.error;
+
+    const tokenIsInvalid =
+      status === 401 &&
+      [
+        "Invalid or expired token",
+        "Missing Authorization header",
+        "Invalid Authorization format",
+      ].includes(errorMessage);
+
+      if (tokenIsInvalid) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.dispatchEvent(new Event("auth:logout"));
+      }
+
     return Promise.reject(err);
   }
 );
