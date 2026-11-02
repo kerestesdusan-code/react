@@ -272,15 +272,35 @@ router.delete("/:id/member/:userId", requireAuth, async (req: AuthRequest, res: 
  * List members of a group
  */
 router.get("/:id/members", requireAuth, async (req: AuthRequest, res: Response) => {
-  const grouId = req.params.id;
+  const groupId = req.params.id;
+  const userId = req.user!.userId;
 
   try {
-    const exists = await db.query(`SELECT id FROM "group" WHERE id = $1`, [grouId]);
+    const exists = await db.query(
+      `SELECT id FROM "group" WHERE id = $1`,
+      [groupId]
+    );
     if (exists.rowCount === 0) {
-      return res.status(404).json({ error: "Group not found"});
+      return res.status(404).json({ error: "Group not found" });
     }
 
-     const members = await db.query<{
+    const membership = await db.query(
+      `
+      SELECT 1
+      FROM user_has_group
+      WHERE group_id = $1
+        AND user_id = $2
+      `,
+      [groupId, userId]
+    );
+
+    if (membership.rowCount === 0) {
+      return res.status(403).json({
+        error: "Only group members can view its members",
+      });
+    }
+
+    const members = await db.query<{
       id: string;
       email: string;
       full_name: string | null;
@@ -299,7 +319,7 @@ router.get("/:id/members", requireAuth, async (req: AuthRequest, res: Response) 
       WHERE uhg.group_id = $1
       ORDER BY uhg.joined_at ASC
       `,
-      [grouId]
+      [groupId]
     );
 
     return res.json({
