@@ -191,6 +191,34 @@ export default function Groups() {
     }
   }
 
+  async function transferOwnership(newOwnerId: string) {
+    if (!selectedGroup) return;
+
+    const confirmed = window.confirm(
+      "Transfer ownership to this member?"
+    );
+
+    if (!confirmed) return;
+
+    setError("");
+    setMessage("");
+
+    try {
+      await axiosInstance.put(`/group/${selectedGroup.id}/owner`, {
+        newOwnerId,
+      });
+
+      setMessage("Group ownership transferred");
+      await loadGroups();
+      await loadMembers(selectedGroup.id);
+    } catch (e: any) {
+      setError(
+        e?.response?.data?.error ||
+          "Failed to transfer group ownership."
+      );
+    }
+  }
+
   async function kickMember(memberId: string) {
     if (!selectedGroup) return;
     if (!window.confirm("Kick this member from the group?")) return;
@@ -327,8 +355,8 @@ export default function Groups() {
 
           {!selectedGroup && (
             <p className="text-gray-600">
-            Select a group to see members.
-          </p>
+              Select a group to see members.
+            </p>
           )}
 
           {selectedGroup && !selectedGroup.isMember && (
@@ -373,13 +401,23 @@ export default function Groups() {
                         </div>
 
                         {isOwnerOfSelected && !isMe && (
-                          <button
-                            className="btn btn-sm btn-error"
-                            type="button"
-                            onClick={() => kickMember(m.id)}
-                          >
-                            Kick
-                          </button>
+                          <div className="flex gap-2">
+                            <button
+                              className="btn btn-sm btn-primary"
+                              type="button"
+                              onClick={() => transferOwnership(m.id)}
+                            >
+                              Transfer ownership
+                            </button>
+
+                            <button
+                              className="btn btn-sm btn-error"
+                              type="button"
+                              onClick={() => kickMember(m.id)}
+                            >
+                              Kick
+                            </button>
+                          </div>
                         )}
                       </div>
                     );

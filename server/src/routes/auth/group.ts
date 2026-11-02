@@ -186,6 +186,76 @@ router.post("/leave", requireAuth, async (req: AuthRequest, res: Response) => {
 });
 
 /**
+ * PUT /api/group/:id/owner
+ * body: { newOwnerId: string }
+ * Only the current owner can transfer ownership
+ */
+router.put("/:id/owner", requireAuth, async (req: AuthRequest, res: Response) => {
+  const groupId = req.params.id;
+  const currentOwnerId = req.user!.userId;
+  const { newOwnerId } = req.body as { newOwnerId?: string };
+
+  if (!newOwnerId) {
+    return res.status(400).json({ error: "newOwnerId is required" });
+  }
+
+  if (newOwnerId === currentOwnerId) {
+    return res.status(400).json({
+      error: "You are already the owner of this group",
+    });
+  }
+
+  try {
+    const groupResult = await db.query<{ owner_id: string }>(
+      `SELECT owner_id FROM "group" WHERE id = $1`,
+      [groupId]
+    );
+
+    if (groupResult.rowCount === 0) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    if (groupResult.rows[0].owner_id !== currentOwnerId) {
+      return res.status(403).json({
+        error: "Only the current owner can transfer ownership",
+      });
+    }
+
+    const membership = await db.query(
+      `
+      SELECT 1
+      FROM user_has_group
+      WHERE group_id = $1
+        AND user_id = $2
+      `,
+      [groupId, newOwnerId]
+    );
+
+    if (membership.rowCount === 0) {
+      return res.status(400).json({
+        error: "The new owner must be a member of the group",
+      });
+    }
+
+    await db.query(
+      `
+      UPDATE "group"
+      SET owner_id = $1
+      WHERE id = $2
+      `,
+      [newOwnerId, groupId]
+    );
+
+    return res.json({
+      message: "Group ownership transferred",
+    });
+  } catch (err) {
+    console.error("PUT /group/:id/owner error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/**
  * PUT /api/group/:id
  * body: { name: string }
  * Only owner can rename group
