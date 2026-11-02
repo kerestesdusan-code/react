@@ -154,10 +154,26 @@ router.post("/leave", requireAuth, async (req: AuthRequest, res: Response) => {
   }
 
   try {
+    const groupResult = await db.query<{ owner_id: string }>(
+      `SELECT owner_id FROM "group" WHERE id = $1`,
+      [groupId]
+    );
+
+    if (groupResult.rowCount === 0) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    if (groupResult.rows[0].owner_id === userId) {
+      return res.status(409).json({
+        error: "Transfer ownership before leaving the group.",
+      });
+    }
+
     await db.query(
       `
       DELETE FROM user_has_group
-      WHERE user_id = $1 AND group_id = $2
+      WHERE user_id = $1
+        AND group_id = $2
       `,
       [userId, groupId]
     );
