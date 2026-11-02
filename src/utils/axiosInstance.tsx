@@ -38,11 +38,11 @@ axiosInstance.interceptors.response.use(
         "Invalid Authorization format",
       ].includes(errorMessage);
 
-      if (tokenIsInvalid) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.dispatchEvent(new Event("auth:logout"));
-      }
+    if (tokenIsInvalid) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.dispatchEvent(new Event("auth:logout"));
+    }
 
     return Promise.reject(err);
   }
