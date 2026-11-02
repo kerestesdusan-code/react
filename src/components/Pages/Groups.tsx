@@ -109,9 +109,13 @@ export default function Groups() {
   }, [isLoggedIn, loadGroups]);
 
   useEffect(() => {
-    if (!selectedGroupId) return;
+    if (!selectedGroupId || !selectedGroup?.isMember) {
+      setMembers([]);
+      return;
+    }
+
     loadMembers(selectedGroupId);
-  }, [selectedGroupId]);
+  }, [selectedGroupId, selectedGroup?.isMember]);
 
   async function createGroup(e: React.FormEvent) {
     e.preventDefault();
@@ -321,9 +325,19 @@ export default function Groups() {
             )}
           </div>
 
-          {!selectedGroup && <p className="text-gray-600">Select a group to see members.</p>}
+          {!selectedGroup && (
+            <p className="text-gray-600">
+            Select a group to see members.
+          </p>
+          )}
 
-          {selectedGroup && (
+          {selectedGroup && !selectedGroup.isMember && (
+            <p className="text-gray-600">
+              Join this group to see its members.
+            </p>
+          )}
+
+          {selectedGroup && selectedGroup.isMember && (
             <>
               {loadingMembers ? (
                 <p className="text-gray-600">Loading members…</p>
