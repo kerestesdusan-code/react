@@ -6,57 +6,6 @@ import { requireAuth, AuthRequest } from "../../middleware/requireAuth";
 const router = Router();
 
 /**
- * GET /api/user
- * list users (auth required)
- */
-router.get("/", requireAuth, async (_req: AuthRequest, res: Response) => {
-  try {
-    const result = await db.query<{
-      id: string;
-      email: string;
-      full_name: string | null;
-      avatar_url: string | null;
-      created_at: string;
-      groups: any;
-    }>(
-      `
-      SELECT
-        u.id,
-        u.email,
-        u.full_name,
-        u.avatar_url,
-        u.created_at,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object('id', g.id, 'name', g.name)
-          ) FILTER (WHERE g.id IS NOT NULL),
-          '[]'::json
-        ) AS groups
-      FROM "user" u
-      LEFT JOIN user_has_group uhg ON uhg.user_id = u.id
-      LEFT JOIN "group" g ON g.id = uhg.group_id
-      GROUP BY u.id
-      ORDER BY u.created_at DESC
-      `
-    );
-
-    return res.json(
-      result.rows.map((r) => ({
-        id: r.id,
-        email: r.email,
-        fullName: r.full_name,
-        avatarUrl: r.avatar_url,
-        createdAt: r.created_at,
-        group: r.groups,
-      }))
-    );
-  } catch (error: any) {
-    console.error("Error fetching users:", error);
-    return res.status(500).json({ error: "Error fetching users" });
-  }
-});
-
-/**
  * PUT /api/user/me
  * body: { fullName, email }
  */

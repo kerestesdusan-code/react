@@ -11,7 +11,7 @@ const Links = [
       { title: "Employee", url: "/projects/employee-list" }
     ]
   },
-  { title: "Users", url: "/users" },
+  { title: "Profile", url: "/users" },
   { title: "Group", url: "/groups" },
   { title: "About Me", url: "/about-me" },
   { title: "Contact Form", url: "/contact-form" },

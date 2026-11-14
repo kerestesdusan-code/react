@@ -13,20 +13,10 @@ type MeUser = {
   group: GroupMini[];
 };
 
-type UserRow = {
-  id: string;
-  email: string;
-  fullName: string | null;
-  avatarUrl?: string | null;
-  createdAt: string;
-  group: GroupMini[];
-};
-
 export default function Users() {
   const { isLoggedIn } = useAuth();
 
   const [me, setMe] = useState<MeUser | null>(null);
-  const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [message, setMessage] = useState<string>("");
@@ -47,13 +37,11 @@ export default function Users() {
     setMessage("");
 
     try {
-      const [meRes, usersRes] = await Promise.all([
-        axiosInstance.get<{ user: MeUser }>("/auth/me"),
-        axiosInstance.get<UserRow[]>("/user"),
-      ]);
+      const meRes = await axiosInstance.get<{ user: MeUser }>(
+        "/auth/me"
+      );
 
       setMe(meRes.data.user);
-      setUsers(usersRes.data);
 
       setFullName(meRes.data.user.fullName || "");
       setEmail(meRes.data.user.email || "");
@@ -137,7 +125,7 @@ export default function Users() {
   if (!isLoggedIn) {
     return (
       <div className="max-w-4xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-2">Users</h1>
+        <h1 className="text-2xl font-bold mb-2">Profile</h1>
         <p className="text-gray-600">Please login first.</p>
       </div>
     );
@@ -147,7 +135,7 @@ export default function Users() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold">Users</h1>
+      <h1 className="text-2xl font-bold">Profile</h1>
 
       {error && (
         <div className="p-3 rounded border border-red-300 bg-red-50 text-red-700">
@@ -302,32 +290,6 @@ export default function Users() {
           )}
         </section>
       )}
-
-      {/* All users */}
-      <section className="p-4 rounded-lg border bg-white">
-        <h2 className="text-xl font-semibold mb-3">All users</h2>
-
-        <div className="overflow-x-auto">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Full name</th>
-                <th>Email</th>
-                <th>Groups</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.fullName || "(no name)"}</td>
-                  <td>{u.email}</td>
-                  <td>{(u.group || []).map((g) => g.name).join(", ") || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
     </div>
   );
 }
