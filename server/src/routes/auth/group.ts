@@ -65,7 +65,7 @@ router.get("/", requireAuth, async (req: AuthRequest, res: Response) => {
     const result = await db.query<{
       id: string;
       name: string;
-      owner_id: string;
+      owner_id: string | null;
       created_at: string;
       member_count: string;
       is_member: boolean;
@@ -134,7 +134,30 @@ router.post("/join", requireAuth, async (req: AuthRequest, res: Response) => {
       [userId, groupId]
     );
 
-    return res.json({ message: "Joined Group"});
+    const ownershipResult = await db.query(
+      `
+      UPDATE "group"
+      SET owner_id = $1
+      WHERE id = $2
+        AND owner_id IS NULL
+        AND NOT EXISTS (
+          SELECT 1
+          FROM user_has_group
+          WHERE group_id = $2
+            AND user_id <> $1
+        )
+      RETURNING owner_id
+      `,
+      [userId, groupId]
+    );
+
+    const becameOwner = ownershipResult.rowCount !== 0;
+
+    return res.json({
+      message: becameOwner
+        ? "Joined group and became owner"
+        : "Joined group",
+    });
   } catch (err) {
     console.error("POST /group/join error:", err);
     return res.status(500).json({ error: "Internal server error"});
@@ -154,8 +177,19 @@ router.post("/leave", requireAuth, async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    const groupResult = await db.query<{ owner_id: string }>(
-      `SELECT owner_id FROM "group" WHERE id = $1`,
+    const groupResult = await db.query<{
+      owner_id: string | null;
+      member_count: string;
+    }>(
+      `
+      SELECT
+        g.owner_id,
+        COUNT(uhg.user_id) AS member_count
+      FROM "group" g
+      LEFT JOIN user_has_group uhg ON uhg.group_id = g.id
+      WHERE g.id = $1
+      GROUP BY g.id
+      `,
       [groupId]
     );
 
@@ -163,20 +197,42 @@ router.post("/leave", requireAuth, async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: "Group not found" });
     }
 
-    if (groupResult.rows[0].owner_id === userId) {
+    const group = groupResult.rows[0];
+    const memberCount = Number(group.member_count);
+    const isOwner = group.owner_id === userId;
+
+    if (isOwner && memberCount > 1) {
       return res.status(409).json({
-        error: "Transfer ownership before leaving the group.",
+        error: "Transfer ownership before leaving the group",
       });
     }
 
-    await db.query(
+    if (isOwner) {
+      await db.query(
+        `
+        UPDATE "group"
+        SET owner_id = NULL
+        WHERE id = $1
+        `,
+        [groupId]
+      );
+    }
+
+    const deleteMembership = await db.query(
       `
       DELETE FROM user_has_group
       WHERE user_id = $1
         AND group_id = $2
+      RETURNING user_id
       `,
       [userId, groupId]
     );
+
+    if (deleteMembership.rowCount === 0) {
+      return res.status(404).json({
+        error: "You are not a member of this group",
+      });
+    }
 
     return res.json({ message: "Left group" });
   } catch (err) {
@@ -206,7 +262,7 @@ router.put("/:id/owner", requireAuth, async (req: AuthRequest, res: Response) =>
   }
 
   try {
-    const groupResult = await db.query<{ owner_id: string }>(
+    const groupResult = await db.query<{ owner_id: string | null }>(
       `SELECT owner_id FROM "group" WHERE id = $1`,
       [groupId]
     );
@@ -270,7 +326,7 @@ router.put("/:id", requireAuth, async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    const ownerCheck = await db.query<{ owner_id: string }>(
+    const ownerCheck = await db.query<{ owner_id: string | null }>(
       `SELECT owner_id FROM "group" WHERE id = $1`,
       [grouId]
     );
@@ -320,7 +376,7 @@ router.delete("/:id/member/:userId", requireAuth, async (req: AuthRequest, res: 
   }
 
   try {
-    const ownerCheck = await db.query<{ owner_id: string }>(
+    const ownerCheck = await db.query<{ owner_id: string | null }>(
       `SELECT owner_id FROM "group" WHERE id = $1`,
       [groupId]
     );

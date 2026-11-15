@@ -1,0 +1,2 @@
+ALTER TABLE "group"
+ALTER COLUMN owner_id DROP NOT NULL;

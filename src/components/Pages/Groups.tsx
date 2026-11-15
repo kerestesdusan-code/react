@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { useAuth } from "../../auth/AuthContext";
+import axios from "axios";
 
 type GroupRow = {
   id: string;
   name: string;
-  ownerId: string;
+  ownerId: string | null;
   createdAt: string;
   memberCount: number;
   isMember: boolean;
@@ -26,6 +27,25 @@ type MemberRow = {
 type MembersResponse = {
   members: MemberRow[];
 };
+
+type ApiErrorResponse = {
+  error?: string;
+};
+
+function getApiErrorMessage(
+  error: unknown,
+  fallbackMessage: string
+): string {
+  if (axios.isAxiosError<ApiErrorResponse>(error)) {
+    return error.response?.data?.error ?? fallbackMessage;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallbackMessage;
+}
 
 export default function Groups() {
   const { isLoggedIn, user } = useAuth();
@@ -75,8 +95,10 @@ export default function Groups() {
         return list[0]?.id ?? null;
       });
       
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to load groups.");
+    } catch (error: unknown) {
+      setError(
+        getApiErrorMessage(error, "Failed to load groups.")
+      );
     } finally {
       setLoading(false);
     }
@@ -88,8 +110,10 @@ export default function Groups() {
     try {
       const res = await axiosInstance.get<MembersResponse>(`/group/${groupId}/members`);
       setMembers(res.data.members || []);
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to load members.");
+    } catch (error: unknown) {
+      setError(
+        getApiErrorMessage(error, "Failed to load members")
+      );
       setMembers([]);
     } finally {
       setLoadingMembers(false);
@@ -132,34 +156,48 @@ export default function Groups() {
       setMessage("Group created");
       setNewGroupName("");
       await loadGroups();
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to create group.");
+    } catch (error: unknown) {
+      setError(
+        getApiErrorMessage(error, "Failed to create group.")
+      );
     }
   }
 
   async function joinGroup(groupId: string) {
     setError("");
     setMessage("");
+
     try {
-      await axiosInstance.post("/group/join", { groupId });
-      setMessage("Joined group");
+      const response = await axiosInstance.post<{ message: string }>(
+        "/group/join",
+        { groupId }
+      );
+
+      setMessage(response.data.message);
       await loadGroups();
-      if (selectedGroupId === groupId) await loadMembers(groupId);
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to join group.");
+    } catch (error: unknown) {
+      setError(
+        getApiErrorMessage(error, "Failed to join group.")
+      );
     }
   }
 
   async function leaveGroup(groupId: string) {
     setError("");
     setMessage("");
+
     try {
-      await axiosInstance.post("/group/leave", { groupId });
-      setMessage("Left group");
+      const response = await axiosInstance.post<{ message: string }>(
+        "/group/leave",
+        { groupId }
+      );
+
+      setMessage(response.data.message);
       await loadGroups();
-      if (selectedGroupId === groupId) await loadMembers(groupId);
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to leave group.");
+    } catch (error: unknown) {
+      setError(
+        getApiErrorMessage(error, "Failed to leave group.")
+      );
     }
   }
 
@@ -186,8 +224,10 @@ export default function Groups() {
       setMessage("Group renamed");
       setRenameOpen(false);
       await loadGroups();
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to rename group.");
+    } catch (error: unknown) {
+      setError(
+        getApiErrorMessage(error, "Failed to rename group.")
+      );
     }
   }
 
@@ -211,10 +251,12 @@ export default function Groups() {
       setMessage("Group ownership transferred");
       await loadGroups();
       await loadMembers(selectedGroup.id);
-    } catch (e: any) {
+    } catch (error: unknown) {
       setError(
-        e?.response?.data?.error ||
+        getApiErrorMessage(
+          error,
           "Failed to transfer group ownership."
+        )
       );
     }
   }
@@ -231,8 +273,10 @@ export default function Groups() {
       setMessage("Member kicked");
       await loadMembers(selectedGroup.id);
       await loadGroups(); // refresh memberCount
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to kick member.");
+    } catch (error: unknown) {
+      setError(
+        getApiErrorMessage(error, "Failed to kick member.")
+      );
     }
   }
 
@@ -289,6 +333,13 @@ export default function Groups() {
           <div className="space-y-2">
             {groups.map((g) => {
               const isOwner = user?.id === g.ownerId;
+              const roleLabel = isOwner
+                ? "owner"
+                : g.isMember
+                  ? "member"
+                  : g.ownerId === null
+                    ? "no owner"
+                    : "not joined";
               const isSelected = g.id === selectedGroupId;
 
               return (
@@ -306,8 +357,7 @@ export default function Groups() {
                   >
                     <div className="font-semibold truncate">{g.name}</div>
                     <div className="text-sm text-gray-600">
-                      members: {g.memberCount} • {isOwner ? "owner" : "member"}
-                      {g.isMember ? "" : " (not joined)"}
+                      members: {g.memberCount} • {roleLabel}
                     </div>
                   </button>
 
