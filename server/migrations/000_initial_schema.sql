@@ -1,5 +1,3 @@
-BEGIN;
-
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE IF NOT EXISTS "user" (
@@ -45,5 +43,3 @@ CREATE INDEX IF NOT EXISTS idx_user_groups_owner_id
 
 CREATE INDEX IF NOT EXISTS idx_user_has_group_group_id
   ON user_has_group (group_id);
-
-COMMIT;

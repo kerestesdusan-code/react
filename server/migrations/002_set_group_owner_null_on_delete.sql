@@ -1,5 +1,3 @@
-BEGIN;
-
 ALTER TABLE "group"
 DROP CONSTRAINT user_groups_owner_id_fkey;
 
@@ -8,5 +6,3 @@ ADD CONSTRAINT user_groups_owner_id_fkey
 FOREIGN KEY (owner_id)
 REFERENCES "user"(id)
 ON DELETE SET NULL;
-
-COMMIT;
