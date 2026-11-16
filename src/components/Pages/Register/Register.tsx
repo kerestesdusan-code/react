@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import axios from "axios";
 
 interface RegisterResponse {
   message: string;
@@ -53,8 +54,12 @@ const Register = () => {
 
       setSuccessMessage(response.data.message || "Registration successful!");
       setFormData({ fullName: "", email: "", password: "" });
-    } catch (error: any) {
-      setErrorMessage(error.response?.data?.error || "Error during registration");
+    } catch (error: unknown) {
+      const message = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error
+        : undefined;
+
+      setErrorMessage(message ?? "Error during registration");
       console.error("Registration error:", error);
     } finally {
       setLoading(false);

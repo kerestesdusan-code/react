@@ -94,12 +94,8 @@ DKReactive`,
       ok: true,
       message: "Message sent successfully.",
     });
-  } catch (err: any) {
-    console.error("[contact_error] send failed", {
-      message: err?.message,
-      code: err?.code,
-      responseCode: err?.responseCode,
-    });
+  } catch (error: unknown) {
+    console.error("[contact_error] send failed", error);
 
     return res.status(500).json({
       ok: false,

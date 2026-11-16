@@ -3,6 +3,7 @@ import axiosInstance from "../../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../auth/AuthContext";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import axios from "axios";
 
 type LoggedUser = {
   id: string;
@@ -94,10 +95,12 @@ const Login = () => {
 
       setSuccessMessage("Login successful!");
       setFormData({ email: "", password: "" });
-    } catch (error: any) {
-      setErrorMessage(
-        error.response?.data?.error || "Login failed. Please try again."
-      );
+    } catch (error: unknown) {
+      const message = axios.isAxiosError<{ error?: string }>(error)
+        ? error.response?.data?.error
+        : undefined;
+
+      setErrorMessage(message ?? "Login failed. Please try again.");
       console.error("Error logging in:", error);
     } finally {
       setLoading(false);

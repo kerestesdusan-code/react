@@ -4,30 +4,35 @@ import { Pool, QueryResult, QueryResultRow } from "pg";
 dotenv.config();
 
 const pool = new Pool({
-    host: process.env.PG_HOST,
-    port: process.env.PG_PORT ? Number(process.env.PG_PORT) : 5432,
-    user: process.env.PG_USER,
-    password: process.env.PG_PASSWORD,
-    database: process.env.PG_DATABASE,
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT ? Number(process.env.PG_PORT) : 5432,
+  user: process.env.PG_USER,
+  password: process.env.PG_PASSWORD,
+  database: process.env.PG_DATABASE,
 });
 
 pool
-    .connect()
-    .then(client => {
-        console.log("connected to PostgreSQL");
-        client.release();
-    })
-    .catch(err => {
-        console.error("Error connecting to PostgreSQL:", err.message);
-    });
+  .connect()
+  .then((client) => {
+    console.log("connected to PostgreSQL");
+    client.release();
+  })
+  .catch((error: unknown) => {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unknown database connection error";
 
-    export const query = <T extends QueryResultRow = QueryResultRow>  (
-        text: string,
-        params?: any[],
-    ): Promise<QueryResult<T>> => {
-        return pool.query<T>(text, params);
-    };
+    console.error("Error connecting to PostgreSQL:", message);
+  });
 
-    const db = {query};
+export const query = <T extends QueryResultRow = QueryResultRow>(
+  text: string,
+  params?: unknown[]
+): Promise<QueryResult<T>> => {
+  return pool.query<T, unknown[]>(text, params);
+};
 
-    export default db;
+const db = { query };
+
+export default db;

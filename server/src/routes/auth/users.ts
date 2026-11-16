@@ -3,6 +3,15 @@ import db from "../../db/db";
 import bcrypt from "bcrypt";
 import { requireAuth, AuthRequest } from "../../middleware/requireAuth";
 
+function hasErrorCode(error: unknown): error is { code: string } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof error.code === "string"
+  );
+}
+
 const router = Router();
 
 /**
@@ -50,11 +59,11 @@ router.put("/me", requireAuth, async (req: AuthRequest, res: Response) => {
         avatarUrl: u.avatar_url,
       },
     });
-  } catch (err: any) {
-    if (err.code === "23505") {
+  } catch (error: unknown) {
+    if (hasErrorCode(error) && error.code === "23505") {
       return res.status(409).json({ error: "Email already in use" });
     }
-    console.error("PUT /user/me error:", err);
+    console.error("PUT /user/me error:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -90,8 +99,8 @@ router.put("/me/avatar", requireAuth, async (req: AuthRequest, res: Response) =>
       message: "Avatar updated",
       avatarUrl: result.rows[0].avatar_url,
     });
-  } catch (err: any) {
-    console.error("PUT /user/me/avatar error:", err);
+  } catch (error: unknown) {
+    console.error("PUT /user/me/avatar error:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -135,8 +144,8 @@ router.put("/me/password", requireAuth, async (req: AuthRequest, res: Response) 
     await db.query(`UPDATE "user" SET password_hash = $1 WHERE id = $2`, [newHash, userId]);
 
     return res.json({ message: "Password updated" });
-  } catch (err: any) {
-    console.error("PUT /user/me/password error:", err);
+  } catch (error: unknown) {
+    console.error("PUT /user/me/password error:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -156,8 +165,8 @@ router.delete("/:id", requireAuth, async (req: AuthRequest, res: Response) => {
     }
 
     return res.json({ message: "User deleted", id: result.rows[0].id });
-  } catch (err: any) {
-    console.error("Delete user error:", err);
+  } catch (error: unknown) {
+    console.error("Delete user error:", error);
     return res.status(500).json({ error: "Internal server error." });
   }
 });
@@ -201,11 +210,11 @@ router.put("/:id", requireAuth, async (req: AuthRequest, res: Response) => {
         avatarUrl: u.avatar_url,
       },
     });
-  } catch (err: any) {
-    if (err.code === "23505") {
+  } catch (error: unknown) {
+    if (hasErrorCode(error) && error.code === "23505") {
       return res.status(409).json({ error: "Email already in use" });
     }
-    console.error("Error updating user:", err);
+    console.error("Error updating user:", error);
     return res.status(500).json({ error: "Error updating user" });
   }
 });

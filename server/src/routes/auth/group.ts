@@ -1,7 +1,15 @@
 import { Router, Response } from "express";
 import db from "../../db/db";
 import { requireAuth, AuthRequest } from "../../middleware/requireAuth";
-import { error } from "console";
+
+function hasErrorCode(error: unknown): error is { code: string } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof error.code === "string"
+  );
+}
 
 const router = Router();
 
@@ -44,11 +52,15 @@ router.post("/", requireAuth, async (req: AuthRequest, res: Response) => {
         name: group.name,
       },
     });
-  } catch (err: any) {
-    if (err.code === "23505") {
-      return res.status(409).json({ error: "Group name already exists" });
+
+  } catch (error: unknown) {
+    if (hasErrorCode(error) && error.code === "23505") {
+      return res.status(409).json({
+        error: "Group name already exists",
+      });
     }
-    console.error("POST /group error:", err);
+
+    console.error("POST /group error:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -353,12 +365,15 @@ router.put("/:id", requireAuth, async (req: AuthRequest, res: Response) => {
       message: "Group renamed",
       group: updated.rows[0],
     });
-  } catch (err: any) {
-    if (err.code === "23505") {
-      return res.status(409).json({ error: "Group name already exists"});
+  } catch (error: unknown) {
+    if (hasErrorCode(error) && error.code === "23505") {
+      return res.status(409).json({
+        error: "Group name already exists",
+      });
     }
-    console.error("PUT /group/:id error", err);
-    return res.status(500).json({ error: "Internal server error"});
+
+    console.error("PUT /group/:id error", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -403,8 +418,8 @@ router.delete("/:id/member/:userId", requireAuth, async (req: AuthRequest, res: 
     }
 
     return res.json({ message: "Member kicked" });
-  } catch (err: any) {
-    console.error("DELETE /group/:id/member/:userId error:", err);
+  } catch (error: unknown) {
+    console.error("DELETE /group/:id/member/:userId error:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -473,8 +488,8 @@ router.get("/:id/members", requireAuth, async (req: AuthRequest, res: Response) 
         joinedAt: m.joined_at,
       })),
     });
-  } catch (err: any) {
-    console.error("GET /group/:id/members error:", err);
+  } catch (error: unknown) {
+    console.error("GET /group/:id/members error:", error);
     return res.status(500).json({ error: "Internal server error"});
   }
 });

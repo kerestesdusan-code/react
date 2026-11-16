@@ -1,6 +1,26 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
-import { useAuth } from "../../auth/AuthContext"; 
+import { useAuth } from "../../auth/AuthContext";
+import axios from "axios";
+
+type ApiErrorResponse = {
+  error?: string;
+};
+
+function getApiErrorMessage(
+  error: unknown,
+  fallbackMessage: string
+): string {
+  if (axios.isAxiosError<ApiErrorResponse>(error)) {
+    return error.response?.data?.error ?? fallbackMessage;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallbackMessage;
+}
 
 type GroupMini = { id: string; name: string };
 
@@ -46,8 +66,8 @@ export default function Users() {
       setFullName(meRes.data.user.fullName || "");
       setEmail(meRes.data.user.email || "");
       setAvatarUrl(meRes.data.user.avatarUrl || "");
-    } catch (e: any) {
-      setError(e?.response?.data?.error || e?.message || "Failed to load users.");
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(error, "Failed to load profile."));
     } finally {
       setLoading(false);
     }
@@ -68,8 +88,8 @@ export default function Users() {
       setMessage(res.data?.message || "Profile updated");
       await loadAll();
       setIsEditing(false);
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to update profile.");
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(error, "Failed to update profile."));
     }
   }
 
@@ -83,8 +103,8 @@ export default function Users() {
       setMessage(res.data?.message || "Avatar updated");
       await loadAll();
       setIsEditing(false);
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to update avatar.");
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(error, "Failed to update avatar."));
     }
   }
 
@@ -102,8 +122,8 @@ export default function Users() {
       setOldPassword("");
       setNewPassword("");
       setIsEditing(false);
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Failed to update password.");
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(error, "Failed to update password."));
     }
   }
 
@@ -117,8 +137,8 @@ export default function Users() {
     try {
       await axiosInstance.delete(`/user/${me.id}`);
       setMessage("Account deleted. Please login/register again.");
-    } catch (e: any) {
-      setError(e?.response?.data?.error || "Delete failed.");
+    } catch (error: unknown) {
+      setError(getApiErrorMessage(error, "Delete failed."));
     }
   }
 

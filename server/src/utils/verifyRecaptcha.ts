@@ -34,8 +34,11 @@ export async function verifyRecaptcha(
     );
 
     return resp.data?.success === true;
-  } catch (err: any) {
-    console.error("[recaptcha_error]", err?.message || err);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Unknown reCAPTCHA error";
+
+    console.error("[recaptcha_error]", message);
     return false;
   }
 }
