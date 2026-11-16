@@ -1,9 +1,12 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
+import { Home } from "./components/Pages/Home/Home";
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test("renders portfolio home page", () => {
+  render(<Home />);
+
+  const heading = screen.getByRole("heading", {
+    name: /welcome to my personal portfolio/i,
+  });
+
+  expect(heading).toBeInTheDocument();
 });
