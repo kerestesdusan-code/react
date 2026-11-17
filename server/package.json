@@ -14,18 +14,13 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "express-rate-limit": "^8.2.1",
     "jsonwebtoken": "^9.0.3",
-    "nano": "^10.1.4",
-    "node-pg-migrate": "^8.0.4",
     "nodemailer": "^6.9.16",
     "pg": "^8.16.3",
-    "uuid": "^10.0.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
